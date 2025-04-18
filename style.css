@@ -1,0 +1,739 @@
+/* Set up scrolly */
+.step {
+  /*background-color: lavender;*/
+  height: 100vh;
+  width: 100%;
+  font-size: 36px;
+  color: hsl(30, 100%, 97%);
+  text-align: center;
+  transition: 0.8s; /* Re-enable transitions for consistency */
+  /* Center content both horizontally and vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Make the flex direction vertical instead of horizontal */
+  flex-direction: column;
+  font-family: "Caveat Brush", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.step:nth-child(1) {
+  background-color: hsl(262, 15%, 65%);
+}
+
+.step:nth-child(2) {
+  background-color: hsl(262, 15%, 65%);
+}
+
+.step:nth-child(3) {
+  background-color: hsl(262, 15%, 65%);
+} 
+  
+.step:nth-child(4) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(5) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(6) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(7) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(8) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(9) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(10) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(11) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+.step:nth-child(12) {
+  background-color: hsl(262, 15%, 65%);
+} 
+
+
+
+/* Main container styles */
+#chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+/* Two-column layout styles */
+.two-column-container {
+  display: flex;
+  width: 100%;
+  gap: 10px; /* Reduced overall gap */
+  height: 80vh; /* Match height with step sections */
+  width: 100%;
+  transition: 0.8s; /* Re-enable transitions for consistency */
+  background-color: hsl(262, 15%, 65%);
+  padding-top: 30px;
+  padding-bottom: 30px;
+  /* Add these properties to match .step behavior in scrollama */
+  position: relative;
+}
+
+/* Second column with smaller width */
+.column:nth-child(1) {
+  flex: 0 0 auto;
+  max-width: 500px;
+  margin-right: 50px; /* Smaller gap after second column */
+  margin-left: 30px; /* Smaller gap after second column */
+  /*box-shadow: 0 0 10px rgba(129, 68, 68, 0.1);*/
+}
+
+/* Third column (map) to fill remaining space */
+.column:nth-child(2) {
+  flex: 1 1 auto; /* Grow to fill remaining space */
+}
+
+/* Content wrapper for text in each step and two-column-container */
+.content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease; /* Re-enable transitions */
+  text-align: center;
+  max-width: 80%;
+}
+
+/* When a step or two-column-container becomes active, show its content with fade-in */
+.step.is-active .content,
+.two-column-container.is-active .content {
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: Add a slight fade-out effect when leaving */
+.step:not(.is-active) .content,
+.two-column-container:not(.is-active) .content {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Specific styling for two-column-container content */
+.two-column-container .content {
+  max-width: 100%; /* Allow full width for the two columns */
+  display: flex;
+  width: 100%;
+}
+
+.two-column-container .column {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Map column (second column) appears first */
+.two-column-container.is-active .column:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s; /* No delay for the map */
+}
+
+/* Chart column (first column) appears with delay */
+.two-column-container.is-active .column:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.3s; /* Delay the chart appearance by 0.3 seconds */
+}
+
+/* When section becomes inactive, ensure everything fades out properly */
+.two-column-container:not(.is-active) .column {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition-delay: 0s; /* No delay when fading out */
+}
+
+
+/* Add these styles to create a pulsing effect */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(101, 116, 112, 0.7);
+  }
+  
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(101, 116, 112, 0);
+  }
+  
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(101, 116, 112, 0);
+  }
+}
+
+/* Add the pulsing animation to the scroll button */
+#scroll-down-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: #657470;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  opacity: 1;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: url('figures/tapirs_pawn_flipped_colored_fade.svg') 12 12, auto !important;
+  /* Adding the pulse animation, but only on the first page */
+  animation: pulse 2s infinite;
+}
+
+#scroll-down-button:hover {
+  background-color: #8b7470;
+  /* Stop the animation on hover */
+  animation: none;
+}
+
+#scroll-down-button svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+/* Class for when the button becomes a "return to top" button */
+#scroll-down-button.return-to-top svg {
+  transform: rotate(180deg);
+}
+
+#scroll-down-button.return-to-top {
+  background-color: #8b7470;
+  /* Stop pulsing when it's in return-to-top mode */
+  animation: none;
+}
+
+#scroll-down-button.return-to-top:hover {
+  background-color: #657470;
+}
+
+/* Stop pulsing after first scroll */
+#scroll-down-button.scrolled {
+  animation: none;
+}
+
+/* CSS-only highlight style */
+.highlight-brush {
+  position: relative;
+  font-weight: 500;
+  display: inline-block;
+  z-index: 1;
+}
+
+.highlight-brush::after {
+  content: '';
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  bottom: 0;
+  height: 40%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q20,5 40,15 Q60,25 80,15 Q100,5 100,15' fill='%23e2cfb7' stroke='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  z-index: -1;
+  opacity: 1;
+  animation: highlightAppear 0.5s ease forwards;
+}
+
+@keyframes highlightAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: Add a slight hover effect */
+.highlight-brush:hover::after {
+  height: 45%;
+  transition: height 0.3s ease;
+}
+
+#tapir-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: -100px auto; /* Reduced negative margin even further */
+  z-index: 10;
+  margin-top: -300px; /* Adjusted top margin for better alignment */
+}
+
+/* Adjusted animation container spacing */
+.tapir-animation-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 0 auto; /* Reduced bottom margin from 20px to 0 */
+  z-index: 10;
+}
+
+/* Bring text elements closer */
+.hidden-text {
+  opacity: 0;
+  transform: translateY(10px); /* Reduced distance */
+  transition: opacity 0s, transform 0s;
+  margin-top: 0; /* Ensure no top margin */
+}
+
+.visible-text {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1.2s ease, transform 1s ease;
+  animation: fadeInText 1.2s ease forwards;
+}
+
+
+/* Ensure tapir SVGs are properly positioned */
+.tapir-svg, .tapir-head-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+  transition: opacity 0.3s ease, left 0.01s linear;
+  margin-top: 70px; /* Added negative margin to pull up text */
+}
+
+.tapir-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.visible {
+  opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tapir-animation-container {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* Video element styles */
+video {
+  width: 30%; /* Adjustable width percentage */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 10px;
+  display: block;
+  margin-top: -5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.video-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Style the main heading (h1) */
+h1 {
+  text-align: center; /* Center align heading */
+  font-family: "Berkshire Swash", serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #657470; /* Dark grey-green color for contrast */
+  font-size: 32px;
+}
+
+/* Tapir styles */
+.tapir-body {
+  fill: #8b7470;
+  stroke: none;
+  stroke-width: 1px;
+}
+
+.tapir-message {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 17px;
+  fill: #f5f5f5;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+.tapir-finger {
+  cursor: pointer;
+  transition: fill 0.3s ease;
+}
+
+.tapir-finger:hover {
+  fill: #d5d8ce;
+}
+
+/* Finger label styles */
+.tapir-finger-label {
+  cursor: pointer;
+}
+
+.finger-label-text {
+  fill: #475d57;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 12px;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+/* Dropdown container (hidden) */
+.hidden-dropdowns {
+  display: none;
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: #475d57;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+.selection-option {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 1s;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+.selection-option:hover {
+  background-color: #eaf7ff;
+}
+
+.selection-option.selected {
+  background-color: #eaf7ff;
+  font-weight: bold;
+}
+
+/* Chart styles */
+#main-chart {
+  margin-top: -10px;
+  padding-top: 0px;
+}
+
+.boundary-circle {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5;
+}
+
+.circular-grid-line {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 0.5;
+  stroke-dasharray: 2, 2;
+}
+
+.radial-grid-line {
+  stroke: #ccc;
+  stroke-width: 0.5;
+  stroke-dasharray: 2, 2;
+}
+
+.hour-label {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 12px;
+  fill: #666;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+.scale-label {
+  text-anchor: middle;
+  font-size: 10px;
+  fill: #999;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+
+/* Tapir selector container */
+.tapir-selector-container {
+  width: 400px;
+  height: 300px;
+  margin-bottom: 0px;
+  padding-bottom: 35px;
+  position: relative;
+}
+
+/* Biome modal styles */
+.biome-modal {
+  color: #475d57;
+  font-size: 10px;
+  display: none;
+  position: absolute; /* Change from fixed to absolute */
+  top: 25%; /* Position it in the middle vertically */
+  left: 98%; /* Position it in the middle horizontally */
+  transform: translate(-50%, -50%); /* Center it precisely */
+  background-color: #d5d8ce;
+  border-radius: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 10;
+  min-width: 100px;
+}
+
+/* If you want the modal to appear relative to a specific element (like the tapir)
+   you can add this class to the parent container */
+.modal-container {
+  position: relative;
+}
+
+
+/* Modal title */
+.modal-title {
+  margin-top: 10px;
+}
+
+/* Selection list within modal */
+.selection-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Selection option styling */
+.selection-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+/* Selected option highlight */
+.selection-option.selected {
+  background-color: #e6f3ff;
+}
+
+
+/* Tapir finger classes */
+.tapir-finger {
+  cursor: pointer;
+}
+
+/* Tapir finger label classes */
+.tapir-finger-label {
+  cursor: pointer;
+}
+
+.tapir-finger, .tapir-finger-label, .selection-option, 
+.biome-modal, .modal-title, .selection-list {
+  cursor: url('figures/tapirs_pawn_flipped_colored_fade.svg') 12 12, auto !important;
+  transition: all 0.3s ease;
+}
+
+.tapir-finger:hover, .tapir-finger-label:hover, .selection-option:hover, 
+.biome-modal:hover, .modal-title:hover, .selection-list:hover {
+  filter: brightness(0.99);
+}
+
+/* Hidden dropdowns container */
+.hidden-dropdowns {
+  display: none;
+}
+
+
+/* Apply styles to the entire page */
+body {
+  font-family: 'Bungee', cursive !important; /* Use 'Bungee' font with cursive fallback, enforce it */
+  /*background-color: rgb(10, 180, 118); /* Light grey background for a clean look 
+  text-align: center; /* Center all text in the body */
+  margin: 0; /* Remove default margin */
+  /*padding: 20px;*/
+  /*transition: cursor 0.3s ease;*/
+}
+
+/* Layout container setup */
+.layout-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px;
+  min-height: 600px; /* Set a minimum height for the entire layout */
+}
+
+
+/* SVG styling */
+#main-chart svg {
+  display: block; /* Ensure SVGs behave as block elements */
+  margin: auto; /* Center align inside their container */
+  border-radius: 50%; /* Make SVGs circular */
+  background: #ffffff; /* White background for clarity */
+  box-shadow: 0 2px 4px rgba(0.2,0.2,0.2,0.2);
+}
+
+
+/* Tooltip styles */
+.tooltip {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  font-size: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+
+/* Hour labels styling - now includes time of day labels */
+.hour-label {
+  font-family: 'Bungee', cursive !important; /* Enforce the 'Bungee' font */
+  font-size: 14px;
+  font-weight: 500;
+  fill: #6f8982 !important; /* Grey-green color for subtle contrast */
+}
+
+/* Circular grid lines styling */
+.circular-grid-line {
+  stroke: #ccc;
+  stroke-dasharray: 2, 2, 48;
+  fill: none;
+}
+
+/* Radial grid lines styling */
+.radial-grid-line {
+  stroke: #ccc;
+  stroke-dasharray: 2, 2;
+}
+
+/* Scale labels styling */
+.scale-label {
+  font-size: 12px;
+  fill: #475d57;
+  fill-opacity: 0.6;
+}
+
+
+/* Biome label styling */
+.biome-label {
+  color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none; /* Prevents the label from blocking clicks */
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+/* You could also define specific styles for each biome type */
+.atlantic-forest {
+  background-color: #2E8B57;
+}
+
+.cerrado {
+  background-color: #CD853F;
+}
+
+.pantanal {
+  background-color: #806D43;
+}
+
+
+/* Map styling with proper height */
+#map { 
+  flex: 1;
+  min-width: auto;
+  background-color: #e0e0e0;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  margin-left: 20px;
+  margin-right: 20px;
+  display: flex;
+  box-sizing: border-box; /* Include padding and border in element's size */
+  align-self: stretch; /* Allow stretching */
+  min-height: 100%; /* Take up full height of the container */
+  max-height: 100%; /* Limit maximum height */
+
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 1500px) {
+  .layout-container {
+      flex-direction: column;
+      height: auto;
+  }
+  
+  #map {
+      width: 100%;
+      margin-top: 20px;
+      height: 400px; /* Fixed height on mobile */
+  }
+}
+
+/* Responsive adjustments for three-column layout */
+@media (max-width: 768px) {
+    .three-column-container {
+        flex-direction: column;
+    }
+    
+    .column {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}

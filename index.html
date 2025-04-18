@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tapir's Diel Activity</title>
+    <link rel="icon" href="figures/tapirs_pawn_flipped_colored.svg" type="image/svg+xml">
+    
+    <!-- mapbox -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet" />
+
+    <!-- Import JS -->
+    <script src="script3.js" type="module"></script> <!-- allows to import modules-->
+
+    <!-- Import Scrolly -->
+    <script src="https://unpkg.com/scrollama"></script>
+    <script src="scrolly.js" defer></script>
+
+    <!-- Import Animation -->
+    <script src="tapir-head-animation.js"></script>
+    <script src="tapir-implementation.js"></script>
+    <script src="animation_0.js" defer></script>
+    <script src="tapir-sleep-animation.js"></script>
+
+    <!-- Import Names -->
+    <script src="names.js" defer></script>
+
+    <!-- Box delay -->
+    <script src="boxes_delay.js" defer></script>
+
+    <!-- Import style from CSS -->
+    <link rel="stylesheet" href="style2.css">
+
+    <!-- Form -->
+    <script src="feedback-form.js" defer></script>
+
+    <!-- Import preconnect font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Import font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Margarine&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <div class="scroll-container">
+            <div class="step" data-index="0-1"> 
+                <div class="content">
+                    <!-- Tapir animation container -->
+                    <div class="tapir-animation-container" id="tapir-container" style="margin-bottom: 0;"></div>
+                    <!-- Text content with hidden class -->
+                    <div id="tapir-text" class="hidden-text">
+                        Hi, my name is <span class="highlight-brush"><span id="random-name"> X </span></span> and I'm a <span class="highlight-brush">Tapir!</span><br>
+                        • <br>
+                        Let's take a walk. <br> <span class="highlight-brush"> Scroll down or click the paws </span> in the corner to start.
+                    </div>
+                </div>
+            </div>
+            <div class="step" data-index="2"> 
+                <div class="content">
+                    Humm, about myself... I'm the <span class="highlight-brush">largest herbivore and frugivore</span> mammal in Brazil. <br><br>
+                    <div class="video-container">
+                        <div class="video-text"></div>
+                        <!-- autoplay, loop, muted, controls -->
+                        <video class="video-player" src="anta2.MP4" type="video/MP4" autoplay loop muted controls></video>
+                    </div>
+                    • <br>
+                    I also have cousins in Central and other countries of South America. <br><br><br><br><br><br><br><br>
+                </div>
+            </div>
+            <div class="step" data-index="3"> 
+                <div class="content">
+                    A <span class="highlight-brush">fun fact</span> about me? <br>
+                    • <br>
+                    Some people call me the <span class="highlight-brush">"Gardner of the forest"</span>, as I facilitate <span class="highlight-brush">seed dispersal and germination</span>. <br>
+                    <br>
+                    <div><img src="figures/frugivore.png" alt="Frugivore" style="width:50%; height:auto; border-radius: 20px"></div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+            <div class="step" data-index="4"> 
+                <div class="content">
+                    We can be found in a variety of habitats, including <br>
+                    <span class="highlight-brush">tropical</span> and <span class="highlight-brush">subtropical forests</span>, <span class="highlight-brush">grasslands</span>, and <span class="highlight-brush">wetlands</span>. 
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+            <div class="step" data-index="5"> 
+                <div class="content">
+                    However, our hometown has been <span class="highlight-brush">shrinking</span> as a consequence of <span class="highlight-brush">deforestation</span>. <br> 
+                    One of these places is the <span class="highlight-brush">Atlantic Forest</span> biome, which almost disappeared due to vegetation loss. <br><br>
+                    <div><img src="figures/biomes.svg" alt="Biomes" style="width:80%; height:auto;"></div>
+                </div>                    
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+            </div>
+            <div class="step" data-index="6">  
+                <div class="content"> 
+                    <div class="image-container">
+                        <img src="figures/satellite.svg" alt="satellite" class="background-image">
+                        <!-- Tapir head animation container -->
+                        <div id="tapirHeadContainer" class="tapir-head-container"></div>
+                    </div>
+                    In an attempt to understand our <span class="highlight-brush">behavior</span> and response to <span class="highlight-brush">habitat loss</span>,<br>
+                    humans from the National Initiative for the <span class="highlight-brush">Lowland Tapir Conservation Initiative (LTCI)</span> <img src="figures/favicon.png" alt="Tapir icon" style="height: 1em; vertical-align: middle; margin-left: 3px;"><br>
+                    have been using <span class="highlight-brush">telemetry collars</span> to track our movements for almost <span class="highlight-brush">30 years</span>.
+                    </div>
+                    <!-- Add this right after your existing text in step 6 -->
+                    <div class="tapir-tracking-mosaic"></div>
+                        <div class="mosaic-container">
+                            <div class="mosaic-item">
+                                <img src="figures/tapir-image-1.jpg" alt="Tapir with tracking collar in grassland" />
+                                <div class="caption">Tapir with telemetry collar walking through its natural habitat</div>
+                            </div>
+                            <div class="mosaic-item">
+                                <img src="figures/researcher-image.jpg" alt="Researcher with tracking antenna" />
+                                <div class="caption">Tracking collared tapirs using radio telemetry equipment</div>
+                            </div>
+                            <div class="mosaic-item">
+                                <img src="figures/night-research-1.jpg" alt="Researchers working with sedated tapir at night" />
+                                <div class="caption">Researchers monitoring a sedated tapir during a health check</div>
+                            </div>
+                            <div class="mosaic-item">
+                                <img src="figures/night-research-2.jpg" alt="Nighttime tapir research" />
+                                <div class="caption">Night field work collecting vital data on tapir movements</div>
+                            </div>
+                            <div class="mosaic-item">
+                                <img src="figures/tapir-release.jpg" alt="Tapir release from transport crate" />
+                                <div class="caption">Tapir release after collar placement and health assessment</div>
+                            </div>
+                            <div class="mosaic-item">
+                                <img src="figures/tapir-closeup.jpg" alt="Close-up of tapir with tracking collar" />
+                                <div class="caption">Close-up of a tapir showing the telemetry collar design</div>
+                            </div>
+                        </div>
+                    </div>
+            <div class="step" data-index="7">
+                <div class="content">
+                    Here, you can explore this information by clicking on the designated tapir toes icons, which allows you to select a specific biome and tapir individual. <br><br>
+                    The application then visualizes the average distance traveled by the selected tapir for each hour throughout the day, displayed in a polar plot format that resembles a watch.
+                </div>
+            </div>
+
+
+            <div class="step" data-index="8">
+                <div class="content">
+                    <img src="figures/Screenshot.png" alt="Biomes">
+                    <div>
+                        <!-- Text box 1 - Top Left -->
+                        <div class="text-box box-1">
+                            Each of my toes represents <br> 
+                            a biome and allows you <br> 
+                            to select a tapir.<br>
+                            Let's select Esperta.
+                        </div>
+                        <div class="text-box box-2">
+                            You will see <br> the tapir's track on the map. <br>
+                            If you click on the line, <br> 
+                            it will display some information <br> 
+                            about the tapir <br>
+                        </div>
+                        <div class="text-box box-3">
+                            You will also be able to <br> 
+                            visualize the average distance <br>
+                            for each hour throughout the day.<br>
+                        </div>            
+                        <div class="text-box box-4">
+                            You can also switch <br> 
+                            the map mode to a satellite view <br> 
+                            by clicking on the button <br> 
+                            or return to the default view <br>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            <div class="two-column-container" data-index="15">
+                <!-- Wrap the entire content with a content div -->
+                <div class="content">
+                    <!-- 1st column: layout-container with chart -->
+                    <div class="column"> 
+                        <!-- Chart container -->
+                        <div id="chart-container"></div>
+                    </div>
+                    <!-- 2nd column: map -->
+                    <div class="column">
+                        <div id="map"></div>
+                    </div>
+                </div> <br>
+            </div>
+            <div class="step" data-index="9"> 
+                <div class="content">
+                    Not sure yet, maybe threats 
+                    <div>
+                        <img src="figures/tapirs_roadkill.png" alt="Tapirs roadkill" style="width:40%; height:auto;">
+                    </div>
+                </div>
+            </div>
+            <div class="step" data-index="16">
+                <div class="content">
+                    <!-- Your original content -->
+                    Thank you for riding with me on this adventure. <br>
+                    • <br>
+                    Would you mind <span class="highlight-brush">telling about yourself</span> 
+                    and <span class="highlight-brush">sharing some thoughts</span>? <br>
+                    • <br>                    
+                    
+                    <!-- Feedback buttons -->
+                    <div class="feedback-buttons">
+                        <button id="age-button" class="feedback-button">
+                            What is your age?
+                        </button>
+                        
+                        <button id="location-button" class="feedback-button">
+                            Where're you from?
+                        </button>
+                        
+                        <button id="feedback-button" class="feedback-button">
+                            Did you like this ride?
+                        </button>
+                    </div>
+                    
+                    <!-- Age input (hidden by default) -->
+                    <div id="age-container" class="feedback-input-container">
+                        <label class="feedback-label">
+                            <input id="age-input" type="number" min="1" max="120" class="feedback-input" placeholder="Enter your age">
+                        </label>
+                    </div>
+                    
+                    <!-- Location dropdown (hidden by default) -->
+                    <div id="location-container" class="feedback-input-container">
+                        <label class="feedback-label">
+                            <select id="location-select" class="feedback-input">
+                                <option value="">Select your country</option>
+                                <!-- Countries will be populated by JavaScript -->
+                            </select>
+                        </label>
+                    </div>
+                    
+                    <!-- Feedback radio buttons (hidden by default) -->
+                    <div id="feedback-container" class="feedback-input-container">
+                        <label class="feedback-label">
+                            <div class="feedback-radio-group">
+                                <label class="feedback-radio-label">
+                                    <input type="radio" name="feedback" value="Yes" class="feedback-radio">
+                                    <span class="feedback-radio-text">Yes</span>
+                                </label>
+                                
+                                <label class="feedback-radio-label">
+                                    <input type="radio" name="feedback" value="No" class="feedback-radio">
+                                    <span class="feedback-radio-text">No</span>
+                                </label>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Submit button (hidden by default) -->
+                    <div id="submit-container">
+                        <button id="submit-button">
+                            Submit
+                        </button>
+                    </div>
+                    
+                    <!-- Thank you message (hidden by default) -->
+                    <div id="thank-you">
+                        I hope you have enjoyed the ride and learned a bit about me. <br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step" data-index="17">
+                <br>
+                <div class="content">
+                    Ohh, it's almost <span class="highlight-brush">dawn</span>, I totally lost track of the time. <br><br>
+                    Click on the <span class="highlight-brush">paws</span> if you want to <span class="highlight-brush">start over</span>. <br>
+                    I'll pick up some <span class="highlight-brush">awake tapir</span> to walk you through. <br>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    
+    <!-- Add the scroll down button -->
+    <div id="scroll-down-button">
+        <svg id="scroll_button_svg" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54.99 34.54">
+            <defs>
+                <style>
+                    #scroll_button_svg .scroll-btn-cls-1 {
+                        fill: #7c6658;
+                        opacity: .8;
+                    }
+                    #scroll_button_svg .scroll-btn-cls-2 {
+                        fill: #3f3519;
+                        opacity: .8;
+                    }
+                </style>
+            </defs>
+            <g id="Layer_1-2" data-name="Layer 1">
+                <g>
+                    <!-- Left foot -->
+                    <g class="left-foot">
+                        <path class="scroll-btn-cls-1" d="M1,8.38c.01.08.1.13.18.11.35-.12.47-.16.63-.19,1.58-.35,3.51.14,4.38,2.83.04.12.1.37.14.82.01.15.03.29.06.43s.06.29.1.42c.14.52.79.68,1.16.3,1.52-1.55,1.83-1.59,2.35-1.79.47-.18,1.26-.28,2.71.14.66.19,1.28-.37,1.16-1.04-.04-.24-.11-.57-.2-1.02-.14-.68-.05-1.78.21-2.43.37-.92.92-1.61,1.73-2.17.17-.12.18-.25.15-.36-.12-.38-.76-1.29-1.02-1.55C12.58.68,9.58-.65,6.38.32,2.35,1.54,1.21,5.84,1.08,7.5c0,0,0,.02,0,.03-.02.09-.1.6-.07.86Z"/>
+                        <path class="scroll-btn-cls-2" d="M15.7,15.58c.51,2.88-.51,5.7-1.71,6.24-1.77.8-4.43-1.08-6.16-3.88-1.36-2.21-.29-5.09,2.19-5.9s5.16.64,5.67,3.54Z"/>
+                        <path class="scroll-btn-cls-2" d="M6,12.18c.34,2.74-.69,5.03-2.5,5.61s-2.41-.5-3.01-3.27c-.7-3.21-.86-5.25.94-5.83s4.21.68,4.56,3.49Z"/>
+                        <path class="scroll-btn-cls-2" d="M20.68,9.59c1.49,2.75,2.11,4.27.16,4.9s-4.81-.37-6.14-3.18c-1.4-2.96-.19-6.01,1.83-6.3,1.23-.18,2.73,1.95,4.16,4.58Z"/>
+                    </g>
+                    <!-- Right foot -->
+                    <g class="right-foot">
+                        <path class="scroll-btn-cls-1" d="M33.92,20.91c.01.08.1.13.18.11.35-.12.47-.16.63-.19,1.58-.35,3.51.14,4.38,2.83.04.12.1.37.14.82.01.15.03.29.06.43s.06.29.1.42c.14.52.79.68,1.16.3,1.52-1.55,1.83-1.59,2.35-1.79.47-.18,1.26-.28,2.71.14.66.19,1.28-.37,1.16-1.04-.04-.24-.11-.57-.2-1.02-.14-.68-.05-1.78.21-2.43.37-.92.92-1.61,1.73-2.17.17-.12.18-.25.15-.36-.12-.38-.76-1.29-1.02-1.55-2.17-2.19-5.16-3.52-8.37-2.54-4.03,1.22-5.16,5.52-5.3,7.17,0,0,0,.02,0,.03-.02.09-.1.6-.07.86Z"/>
+                        <path class="scroll-btn-cls-2" d="M48.62,28.11c.51,2.88-.51,5.7-1.71,6.24-1.77.8-4.43-1.08-6.16-3.88-1.36-2.21-.29-5.09,2.19-5.9s5.16.64,5.67,3.54Z"/>
+                        <path class="scroll-btn-cls-2" d="M38.91,24.71c.34,2.74-.69,5.03-2.5,5.61s-2.41-.5-3.01-3.27c-.7-3.21-.86-5.25.94-5.83s4.21.68,4.56,3.49Z"/>
+                        <path class="scroll-btn-cls-2" d="M53.6,22.12c1.49,2.75,2.11,4.27.16,4.9s-4.81-.37-6.14-3.18c-1.4-2.96-.19-6.01,1.83-6.3,1.23-.18,2.73,1.95,4.16,4.58Z"/>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </div>
+</body>
+</html>
