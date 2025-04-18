@@ -6,43 +6,38 @@
     <title>Tapir's Diel Activity</title>
     <link rel="icon" href="figures/tapirs_pawn_flipped_colored.svg" type="image/svg+xml">
     
-    <!-- mapbox -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet" />
-
-    <!-- Import JS -->
-    <script src="script3.js" type="module"></script> <!-- allows to import modules-->
-
-    <!-- Import Scrolly -->
-    <script src="https://unpkg.com/scrollama"></script>
-    <script src="scrolly.js" defer></script>
-
-    <!-- Import Animation -->
-    <script src="tapir-head-animation.js"></script>
-    <script src="tapir-implementation.js"></script>
-    <script src="animation_0.js" defer></script>
-    <script src="tapir-sleep-animation.js"></script>
-
-    <!-- Import Names -->
-    <script src="names.js" defer></script>
-
-    <!-- Box delay -->
-    <script src="boxes_delay.js" defer></script>
-
-    <!-- Import style from CSS -->
+    <!-- Import style from CSS first -->
     <link rel="stylesheet" href="style2.css">
-
-    <!-- Form -->
-    <script src="feedback-form.js" defer></script>
-
-    <!-- Import preconnect font from Google Fonts -->
+    
+    <!-- Import fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Import font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Margarine&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
+    
+    <!-- mapbox -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet" />
+    
+    <!-- Third-party libraries first -->
+    <script src="https://unpkg.com/scrollama"></script>
+    
+    <!--  core scripts -->
+    <script src="script3.js" type="module"></script>
+    
+    <!--  animation and utility scripts -->
+    <script src="tapir-head-animation.js" defer></script>
+    <script src="tapir-implementation.js" defer></script>
+    <script src="animation_0.js" defer></script>
+    <script src="tapir-sleep-animation.js" defer></script>
+    <script src="names.js" defer></script>
+    <script src="boxes_delay.js" defer></script>
+    
+    <!--  UI-related scripts -->
+    <script src="scrolly.js" defer></script>
+    <script src="feedback-form.js" defer></script>
+
 </head>
 <body>
     <main>
