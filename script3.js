@@ -102,6 +102,315 @@ defs.append("filter")
     .attr("stdDeviation", "4")
     .attr("flood-color", "rgba(0, 0, 0, 0.1)");
 
+
+/************************************/
+/* TUTORIAL GUIDANCE SYSTEM         */
+/************************************/
+
+// Create tutorial elements
+const tutorialContainer = container.append("div").attr("class", "tutorial-container");
+
+// Add initial Start Tutorial button
+tutorialContainer.append("button")
+    .attr("class", "restart-btn")
+    .text("Start Tutorial")
+    .style("opacity", "1")
+    .on("click", function() {
+        // Remove this button when clicked
+        d3.select(this).remove();
+        // Start the tutorial
+        startTutorial();
+    });
+
+// Get random name from the document if possible
+function getRandomTapirName() {
+    // First try to use the random-name element if it exists
+    const randomNameElement = document.getElementById('random-name');
+    if (randomNameElement && randomNameElement.textContent) {
+        return randomNameElement.textContent;
+    }
+    
+    // If we can't find the element, return a default name
+    return "Esperta";
+}
+
+// Define text boxes but don't add them to the document yet
+const textBoxes = [
+    {
+        id: "box-1",
+        text: "Each of my toes represents<br>a biome allowing you<br>to select a tapir.<br>Let's use myself as an example.",
+        position: { top: "12%", left: "80%" }
+    },
+    {
+        id: "box-2",
+        text: "You'll' see<br>the tapir's track on the map.<br>If you click on the line,<br>it'll display some information<br>about the tapir",
+        position: { top: "10%", left: "260%" }
+    },
+    {
+        id: "box-3",
+        text: "You'll also be able to<br>visualize the average distance<br>for each hour throughout the day.",
+        position: { bottom: "20%", left: "100%" }
+    },
+    {
+        id: "box-4",
+        text: "You can also switch<br>the map mode to a satellite view<br>by clicking on the satellite button <span class='icon-example'>🛰️</span><br>or return to the default view.<br>Use the home button <span class='icon-example'>⌂</span> to reset the map view.",
+        position: { bottom: "55%", left: "335%" }
+    }
+];
+
+// Function to start the tutorial
+function startTutorial() {
+    // Get the random name right when the tutorial starts
+    const randomTapirName = getRandomTapirName();
+    
+    // Update the first text box with the random name
+    textBoxes[0].text = `Each of my toes represents<br>a biome allowing you<br>to select a tapir.<br>Let's select myself as an example: ${randomTapirName}.`;
+    
+    // Create text boxes now that tutorial is starting
+    textBoxes.forEach((box, index) => {
+        const textBox = tutorialContainer.append("div")
+            .attr("class", `text-box ${box.id}`)
+            .attr("id", box.id)
+            .style("opacity", "0")
+            .style("transform", "translateY(20px)")
+            .html(box.text);
+        
+        // Apply positioning
+        Object.entries(box.position).forEach(([key, value]) => {
+            textBox.style(key, value);
+        });
+        
+        // Add sequential animation timing
+        setTimeout(() => {
+            textBox.style("opacity", "1")
+                .style("transform", "translateY(0)");
+        }, 500 + (index * 500)); // Stagger the animations
+    });
+    
+    // Add exit button
+    const exitButton = tutorialContainer.append("button")
+        .attr("class", "restart-btn")
+        .text("Exit Tutorial")
+        .style("opacity", "0");
+        
+    exitButton.on("click", function() {
+        // Hide and remove all text boxes
+        tutorialContainer.selectAll(".text-box")
+            .style("opacity", "0")
+            .style("transform", "translateY(20px)")
+            .remove();
+        
+        // Remove exit button
+        d3.select(this).remove();
+        
+        // Reset any selections
+        biomeIds.forEach(id => {
+            const dropdown = biomeElements[id].dropdown;
+            dropdown.property("value", "none");
+            const fingerElement = biomeElements[id].finger;
+            fingerElement.attr("fill", "#d1d1d1");
+            fingerLabels[id].text(biomeData[id].name);
+            TapirEventSystem.updateSelection(id, "none", "none");
+        });
+        
+        // Update the visualization
+        updatePlot();
+        
+        // Reset map view to original position
+        if (typeof map !== 'undefined') {
+            map.flyTo({
+                center: [-54.2, -21.5],
+                zoom: 7.5,
+                bearing: 0,
+                pitch: 60,
+                duration: 1500
+            });
+            
+            // Also reset any highlights on the map
+            if (typeof resetHighlights === 'function') {
+                resetHighlights();
+            }
+        }
+        
+        // Show a new "Start Tutorial" button
+        tutorialContainer.append("button")
+            .attr("class", "restart-btn")
+            .text("Start Tutorial")
+            .style("opacity", "1")
+            .on("click", function() {
+                d3.select(this).remove(); // Remove this button
+                startTutorial(); // Start the tutorial
+            });
+    });
+    
+    // Show exit button after all boxes are shown
+    setTimeout(() => {
+        exitButton.style("opacity", "1");
+    }, 500 + (textBoxes.length * 500));
+    
+    // Auto-select the random tapir as part of the tutorial
+    // We need to wait for the data to be loaded first
+    const checkDataInterval = setInterval(() => {
+        if (csvDataLoaded) {
+            clearInterval(checkDataInterval);
+            
+            // Try to find and select the random tapir
+            let tapirFound = false;
+            
+            biomeIds.forEach(id => {
+                const dropdown = biomeElements[id].dropdown;
+                const options = Array.from(dropdown.node().options);
+                
+                const tapirOption = options.find(option => 
+                    option.text.toLowerCase().includes(randomTapirName.toLowerCase())
+                );
+                
+                if (tapirOption && !tapirFound) {
+                    tapirFound = true;
+                    // Set the dropdown value to the selected tapir
+                    dropdown.property("value", tapirOption.value);
+                    // Update finger appearance
+                    const fingerElement = biomeElements[id].finger;
+                    fingerElement.attr("fill", biomeData[id].colorFinger);
+                    // Update label text
+                    fingerLabels[id].text(tapirOption.text);
+                    // Update event system
+                    TapirEventSystem.updateSelection(id, "individual", tapirOption.value);
+                    // Update the visualization
+                    updatePlot();
+                }
+            });
+            
+            // If random tapir not found, pick the first available one
+            if (!tapirFound) {
+                console.warn(`Could not find tapir named: ${randomTapirName}`);
+                
+                // Get a random biome ID
+                const randomBiomeIndex = Math.floor(Math.random() * biomeIds.length);
+                const randomBiomeId = biomeIds[randomBiomeIndex];
+                
+                const dropdown = biomeElements[randomBiomeId].dropdown;
+                const options = Array.from(dropdown.node().options);
+                
+                // Skip "None" and "All" options (first two)
+                if (options.length > 2) {
+                    // Get a random individual option (excluding None and All)
+                    const randomOptionIndex = 2 + Math.floor(Math.random() * (options.length - 2));
+                    const randomOption = options[randomOptionIndex];
+                    
+                    // Set the dropdown value
+                    dropdown.property("value", randomOption.value);
+                    // Update finger appearance
+                    const fingerElement = biomeElements[randomBiomeId].finger;
+                    fingerElement.attr("fill", biomeData[randomBiomeId].colorFinger);
+                    // Update label text
+                    fingerLabels[randomBiomeId].text(randomOption.text);
+                    // Update event system
+                    TapirEventSystem.updateSelection(randomBiomeId, "individual", randomOption.value);
+                    // Update the visualization
+                    updatePlot();
+                }
+            }
+        }
+    }, 500);
+}
+
+// Add CSS for tutorial elements
+const tutorialStyle = document.createElement('style');
+tutorialStyle.innerHTML = `
+.tutorial-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.text-box {
+    position: absolute;
+    background-color: rgba(162, 152, 179, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 250px;
+    min-height: 50px;
+    border: 1px solid #ccc;
+    font-size: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+    line-height: 1.4;
+    font-family: "Caveat Brush", cursive;
+}
+
+.restart-btn {
+    position: absolute;
+    top: 10px;
+    left: 1660px;
+    padding: 10px 15px;
+    background-color:rgba(162, 152, 179, 0.9);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 25px;
+    pointer-events: auto;
+    transition: opacity 0.5s ease;
+    z-index: 1001;
+    font-family: "Caveat Brush", cursive;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 0 rgba(133, 114, 98, 0.4);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(133, 114, 98, 0.7);
+    }
+    
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(133, 114, 98, 0);
+    }
+    
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(133, 114, 98, 0);
+    }
+}
+
+/* Mobile styles */
+@media screen and (max-width: 767px) {
+    .text-box {
+        position: static !important;
+        margin: 10px auto !important;
+        width: 90% !important;
+        max-width: 400px !important;
+        transform: none !important;
+        display: block !important;
+        font-size: 14px !important;
+        min-height: auto !important;
+    }
+    
+    .box-1, .box-2, .box-3, .box-4 {
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+    }
+    
+    .restart-btn {
+        bottom: 20px;
+        top: auto;
+    }
+}
+`;
+document.head.appendChild(tutorialStyle);
+
+
 // Create tapir structure
 const tapirGroup = selectorSvg.append("g").attr("transform", "scale(0.8) translate(50, 50)");
 

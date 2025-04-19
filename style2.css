@@ -700,6 +700,8 @@
   /* ==============================================
     12. RESPONSIVE STYLES
     ============================================== */
+
+    
   /* Mobile and small screens */
   @media (max-width: 768px) {
     /* Layout adjustments */
@@ -872,128 +874,11 @@
     }
   }
 
-  /* ==============================================
-    13. TEXT BOXES
-    ============================================== */
-/* Desktop styles remain unchanged */
-.step[data-index="8"] img[src="figures/Screenshot.png"] {
-  width: 120%;
-  max-width: 100vw;
-  height: auto;
-  max-height: 100vh;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-  position: relative;
-  left: -10%; /* Compensates for the wider width */
-}
-
-.text-box {
-  position: absolute;
-  background-color: rgba(162, 152, 179, 1);
-  padding: 10px;
-  border-radius: 5px;
-  min-width: 120px;
-  min-height: 50px;
-  border: 1px solid #ccc;
-  font-size: 25px !important;
-  display: flex;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.text-box.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.box-1 {
-  top: 35%;
-  left: 15%;
-}
-
-.box-2 {
-  top: 38%;
-  left: 73%;
-  transform: translate(-50%, -50%);
-}
-
-.box-2.visible {
-  transform: translate(-50%, -50%);
-}
-
-.box-3 {
-  bottom: 30%;
-  left: 20%;
-}
-
-.box-4 {
-  bottom: 38%;
-  left: 96%;
-}
-
-.restart-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  padding: 10px 15px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* Mobile styles */
-@media screen and (max-width: 767px) {
-  /* Important! Force hide the image */
-  .step[data-index="8"] img[src="figures/Screenshot.png"] {
-    display: none !important;
-  }
-  
-  /* Reset the content container */
-  .step[data-index="8"] .content {
-    position: static;
-    padding: 20px 10px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  /* Style for stacked text boxes */
-  .step[data-index="8"] .text-box {
-    position: static !important;
-    margin: 10px auto !important;
-    width: 90% !important;
-    max-width: 400px !important;
-    transform: none !important;
-    opacity: 1 !important;
-    display: block !important;
-    font-size: 16px !important;
-    min-height: auto !important;
-  }
-  
-  /* Remove all positioning */
-  .step[data-index="8"] .box-1,
-  .step[data-index="8"] .box-2,
-  .step[data-index="8"] .box-3,
-  .step[data-index="8"] .box-4 {
-    left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-  }
-}
-
-
 
 
 /* ==============================================
     14. TAPIR HEAD STYLES
 ============================================== */
-
 
 
 .image-container {
