@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle form submission
     submitButton.addEventListener('click', function() {
-        // Send all data to Google Sheets
-        sendToGoogleSheets(formData);
+        // Use the new form submission function
+        sendToGoogleForm(formData);
         
         // Show thank you message
         thankYouMessage.style.display = 'block';
@@ -168,28 +168,51 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackButton.style.backgroundColor = '';
     });
     
-    // Function to send data to Google Sheets
-    function sendToGoogleSheets(data) {
-        // In a real implementation, you would use Google Apps Script with a Web App deployment
-        // Example: Using fetch to send data to a Google Apps Script Web App
+    // Function to send data to Google Form
+    function sendToGoogleForm(data) {
+        // Form submission URL
+        const formUrl = "https://docs.google.com/forms/d/10hTG8qn5GtfG18Tg_b7isYTZ1spRt21vNSyqSt1rbwk/formResponse";
         
-        const url = "https://script.google.com/macros/s/AKfycbzAbct47a4VvdX0liwHmXIDSLxzJOZMwe5hlt-HdLACIy-hgQI0FYPbCPVaOzpAaRxZzQ/exec"; // Your deployed Google Apps Script URL
+        // Create a FormData object with the correct entry IDs
+        const formData = new FormData();
+        formData.append('entry.168865574', data.age);         // Age field
+        formData.append('entry.2085059612', data.location);   // Location field
+        formData.append('entry.2116187728', data.feedback);   // Feedback field
         
-        fetch(url, {
-            method: 'POST',
-            mode: 'no-cors',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            redirect: 'follow',
-            body: JSON.stringify(data)
-        })
-        .then(response => console.log('Success!'))
-        .catch(error => console.error('Error:', error));
+        // Create an invisible iframe to submit the form (avoids CORS issues)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
         
-        // Log the data for now
-        console.log('Data to send to Google Sheets:', data);
+        // Set up form in iframe
+        iframe.onload = function() {
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const form = iframeDoc.createElement('form');
+            form.method = 'POST';
+            form.action = formUrl;
+            
+            // Add form data
+            for (const [key, value] of formData.entries()) {
+                const input = iframeDoc.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            // Add form to iframe and submit
+            iframeDoc.body.appendChild(form);
+            form.submit();
+            console.log('Form submitted!', data);
+            
+            // Clean up after submission
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };
+        
+        // Set src to about:blank to trigger onload
+        iframe.src = 'about:blank';
     }
 
     // Initialize - hide all inputs

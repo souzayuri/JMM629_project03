@@ -13,6 +13,9 @@
    10. NAVIGATION & CONTROLS
    11. ANIMATIONS & KEYFRAMES
    12. RESPONSIVE STYLES
+   13. TAPIR HEAD STYLES
+   14. TAPIR PICTURES MOSAIC
+   15. TAPIR QUESTIONNAIRE
    ================================================ */
 
 /* ==============================================
@@ -134,7 +137,7 @@
     font-family: "Caveat Brush", cursive;
     font-weight: 400;
     font-style: normal;
-    background-color: rgb(162, 152, 179);
+    background-color: #a298b3;
   }
       
   /* When a step or two-column-container becomes active, show its content with fade-in */
@@ -395,7 +398,7 @@
     display: block;
     margin: auto;
     border-radius: 50%;
-    background: #ffffff;
+    background: #fff7f0;
     box-shadow: 0 2px 4px rgba(0.2,0.2,0.2,0.2);
     width: 100%;
     height: auto;
@@ -476,7 +479,7 @@
     position: absolute;
     visibility: hidden;
     pointer-events: none;
-    background: rgba(255, 255, 255, 0.9);
+    background: #fff7f0;
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 15px;
@@ -877,7 +880,7 @@
 
 
 /* ==============================================
-    14. TAPIR HEAD STYLES
+    13. TAPIR HEAD STYLES
 ============================================== */
 
 
@@ -915,7 +918,7 @@
 
 
 /* ==============================================
-    15. TAPIR PICTURES MOSAIC
+    14. TAPIR PICTURES MOSAIC
 =============================================== */
 .mosaic-container {
   display: grid;
@@ -950,7 +953,7 @@
   left: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  color: white;
+  color: #fff7f0;
   padding: 8px;
   font-size: 12px;
   opacity: 0;
@@ -973,7 +976,7 @@
 }
 
 /* ==============================================
-    16. TAPIR QUESTIONNAIRE  
+    15. TAPIR QUESTIONNAIRE  
 =============================================== */
 
 
@@ -988,24 +991,25 @@
 
 .feedback-button {
   font-family: 'Caveat Brush', cursive;
-  background: #fff;
-  border: 2px solid #000;
+  background-color: #fffaf0;
+  color: #2d2b2b;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 18px;
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: 3px 3px 0px #696363;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .feedback-button:hover {
   transform: translateY(-2px);
-  box-shadow: 3px 5px 0px #000;
+  box-shadow: 3px 5px 0px #696363;
 }
 
 .feedback-button:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px #000;
+  box-shadow: 2px 2px 0px #696363;
 }
 
 .feedback-input-container {
@@ -1020,7 +1024,8 @@
 
 .feedback-input {
   font-family: 'Caveat Brush', cursive;
-  border: 2px solid #000;
+  color: #2d2b2b;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px;
   margin: 10px 0;
@@ -1054,24 +1059,25 @@
 
 #submit-button {
   font-family: 'Caveat Brush', cursive;
+  color: #2d2b2b;
   background: #9ee5d4;
-  border: 2px solid #000;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 18px;
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: 3px 3px 0px #696363;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 #submit-button:hover {
   transform: translateY(-2px);
-  box-shadow: 3px 5px 0px #000;
+  box-shadow: 3px 5px 0px #696363;
 }
 
 #submit-button:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px #000;
+  box-shadow: 2px 2px 0px #696363;
 }
 
 #submit-container {
@@ -1083,8 +1089,8 @@
 #thank-you {
   display: none;
   font-family: 'Caveat Brush', cursive;
-  font-size: 20px;
-  color: #2a9d8f;
+  font-size: 30px;
+  color: #fffaf0;
   margin: 15px 0;
   text-align: center;
 }
