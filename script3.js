@@ -148,7 +148,7 @@ const textBoxes = [
     },
     {
         id: "box-3",
-        text: "You'll also be able to<br>visualize the total distance<br> walked for each hour throughout the day over the sample time.",
+        text: "You'll also be able to<br>visualize the total distance<br> walked for each hour throughout the day over the sampled time.",
         position: { bottom: "20%", left: "100%" }
     },
     {
