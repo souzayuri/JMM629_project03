@@ -20,9 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Also check on window resize as this can trigger layout changes
     window.addEventListener('resize', function() {
         const chartContainer = document.getElementById('lollipop-chart-container');
-        if (chartContainer && isElementVisible(chartContainer) && 
-            !chartContainer.hasAttribute('data-chart-rendered')) {
-            console.log("Chart container is now visible after resize, rendering chart");
+        if (chartContainer && isElementVisible(chartContainer)) {
+            console.log("Chart container resized, re-rendering chart");
+            // Remove the data-chart-rendered attribute to allow re-rendering
+            chartContainer.removeAttribute('data-chart-rendered');
             generateAgeLollipopChart('lollipop-chart-container');
             chartContainer.setAttribute('data-chart-rendered', 'true');
         }
@@ -177,17 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Create the lollipop chart SVG
-    function createLollipopChart(chartData) {
+    function createLollipopChart(chartData, containerWidth) {
         // Check if there's data to display
         if (!chartData || chartData.length === 0) {
             console.warn("No chart data available");
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('width', 800);
-            svg.setAttribute('height', 600);
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '600');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
             
             const noDataText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            noDataText.setAttribute('x', 400);
-            noDataText.setAttribute('y', 300);
+            noDataText.setAttribute('x', '50%');
+            noDataText.setAttribute('y', '300');
             noDataText.setAttribute('class', 'no-data-text');
             noDataText.setAttribute('text-anchor', 'middle');
             noDataText.textContent = 'No data available yet. Submit the form to see results!';
@@ -198,22 +200,38 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log("Creating chart with data:", chartData);
         
-        // SVG dimensions and margins
-        const width = 800;
-        const height = 600;
-        const margin = { top: 40, right: 120, bottom: 60, left: 150 };
+        // SVG dimensions and margins - now based on container width
+        const width = containerWidth || 800; // Default to 800 if containerWidth is not provided
+        const height = Math.min(600, Math.max(400, width * 0.75)); // Responsive height based on width
+        
+        // Adjust margins based on screen size
+        const margin = { 
+            top: Math.max(20, width * 0.05), 
+            right: Math.max(60, width * 0.15), 
+            bottom: Math.max(40, width * 0.075), 
+            left: Math.max(100, width * 0.175)
+        };
+        
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
         
-        // Only take top 15 countries if there are many
-        const displayData = chartData.slice(0, 15);
-        console.log("Displaying top countries:", displayData.length);
+        // Determine how many countries to display based on available height
+        const itemHeight = Math.min(30, Math.max(20, innerHeight / 15)); // Min 20px, max 30px per item
+        const maxItems = Math.floor(innerHeight / itemHeight);
+        
+        // Only take top N countries based on available space
+        const displayData = chartData.slice(0, maxItems);
+        console.log(`Displaying top ${displayData.length} countries in ${innerHeight}px height`);
+        
+        // Recalculate inner height based on actual number of items
+        const actualInnerHeight = displayData.length * itemHeight;
         
         // SVG container
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('width', width);
+        svg.setAttribute('width', '100%');
         svg.setAttribute('height', height);
         svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
         svg.style.display = 'block'; // Ensure the SVG is displayed as block
         svg.style.margin = '0 auto'; // Center the SVG
         
@@ -221,9 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const xMax = Math.max(...displayData.map(d => d.maxAge), 100);
         const xScale = innerWidth / xMax;
         
-        const yScale = innerHeight / displayData.length;
-        
-        // Chart title removed as requested
+        const yScale = actualInnerHeight / displayData.length;
         
         // Create a group for the chart content
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -232,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add X axis
         const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        xAxis.setAttribute('transform', `translate(0, ${innerHeight})`);
+        xAxis.setAttribute('transform', `translate(0, ${actualInnerHeight})`);
         
         // X axis line
         const xAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -243,8 +259,11 @@ document.addEventListener('DOMContentLoaded', function() {
         xAxisLine.setAttribute('class', 'axis-line');
         xAxis.appendChild(xAxisLine);
         
+        // Determine tick spacing based on available width
+        const tickSpacing = width < 500 ? 20 : 10; // Fewer ticks on smaller screens
+        
         // X axis ticks and labels
-        for (let i = 0; i <= xMax; i += 10) {
+        for (let i = 0; i <= xMax; i += tickSpacing) {
             const tickX = i * xScale;
             
             // Tick line
@@ -255,6 +274,9 @@ document.addEventListener('DOMContentLoaded', function() {
             tick.setAttribute('y2', 5);
             tick.setAttribute('class', 'axis-tick');
             xAxis.appendChild(tick);
+            
+            // Skip some labels on smaller screens
+            if (width < 500 && i % 20 !== 0 && i !== 0) continue;
             
             // Tick label
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -295,34 +317,44 @@ document.addEventListener('DOMContentLoaded', function() {
             circleGroup.setAttribute('class', 'lollipop-group');
             g.appendChild(circleGroup);
             
+            // Calculate circle size based on count and available space
+            const baseSize = width < 500 ? 3 : 5;
+            const maxSize = width < 500 ? 7 : 10;
+            const circleSize = Math.min(maxSize, Math.max(baseSize, d.count * (width < 500 ? 0.75 : 1.5)));
+            
             // Average age marker (the lollipop circle)
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', d.avgAge * xScale);
             circle.setAttribute('cy', yPos);
-            circle.setAttribute('r', Math.min(10, Math.max(5, d.count * 1.5))); // Size based on count, with limits
+            circle.setAttribute('r', circleSize);
             circle.setAttribute('class', 'lollipop-circle');
             circle.setAttribute('data-count', d.count);
             
-            // Tooltip on hover - keep existing tooltip data
+            // Tooltip on hover
             circle.setAttribute('data-tooltip', `${d.country}: Avg Age ${d.avgAge}, Range ${d.minAge}-${d.maxAge}, Count: ${d.count}`);
             circleGroup.appendChild(circle);
             
             // Create count display text that will be shown on hover
             const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             countText.setAttribute('x', d.avgAge * xScale);
-            countText.setAttribute('y', yPos - 15); // Position above the circle
+            countText.setAttribute('y', yPos - circleSize - 5); // Position above the circle
             countText.setAttribute('text-anchor', 'middle');
             countText.setAttribute('class', 'count-text');
             countText.style.opacity = '0'; // Hidden by default
             countText.textContent = d.count;
             
+            // Adjust font size for smaller screens
+            if (width < 500) {
+                countText.setAttribute('font-size', '14px');
+            }
+            
             // Create count background for better visibility
             const countBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            const textWidth = String(d.count).length * 8 + 6; // Estimate text width
-            const textHeight = 16; // Estimate text height
+            const textWidth = String(d.count).length * (width < 500 ? 6 : 8) + 6; // Estimate text width
+            const textHeight = width < 500 ? 12 : 16; // Estimate text height
             
             countBackground.setAttribute('x', d.avgAge * xScale - textWidth/2);
-            countBackground.setAttribute('y', yPos - 15 - textHeight/2);
+            countBackground.setAttribute('y', yPos - circleSize - 5 - textHeight/2);
             countBackground.setAttribute('width', textWidth);
             countBackground.setAttribute('height', textHeight);
             countBackground.setAttribute('rx', 3); // Rounded corners
@@ -341,6 +373,12 @@ document.addEventListener('DOMContentLoaded', function() {
             label.setAttribute('text-anchor', 'end');
             label.setAttribute('dominant-baseline', 'middle');
             label.textContent = d.country;
+            
+            // Adjust font size for smaller screens
+            if (width < 500) {
+                label.setAttribute('font-size', '12px');
+            }
+            
             g.appendChild(label);
             
             // Age range label
@@ -349,7 +387,21 @@ document.addEventListener('DOMContentLoaded', function() {
             rangeLabel.setAttribute('y', yPos);
             rangeLabel.setAttribute('class', 'range-label');
             rangeLabel.setAttribute('dominant-baseline', 'middle');
-            rangeLabel.textContent = `${d.minAge}-${d.maxAge} (avg: ${d.avgAge})`;
+            
+            // For smaller screens, show simplified label
+            if (width < 600) {
+                rangeLabel.textContent = `avg: ${d.avgAge}`;
+            } else if (width < 800) {
+                rangeLabel.textContent = `${d.minAge}-${d.maxAge}`;
+            } else {
+                rangeLabel.textContent = `${d.minAge}-${d.maxAge} (avg: ${d.avgAge})`;
+            }
+            
+            // Adjust font size for smaller screens
+            if (width < 500) {
+                rangeLabel.setAttribute('font-size', '10px');
+            }
+            
             g.appendChild(rangeLabel);
             
             // Add hover events to show/hide count
@@ -377,6 +429,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Get the current container width
+        const containerWidth = container.clientWidth;
+        console.log("Container width:", containerWidth);
+        
         // Show loading message
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'loading-indicator';
@@ -399,15 +455,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const chartData = processDataForLollipopChart(data);
             
-            // Create and append the chart
-            const chartSvg = createLollipopChart(chartData);
+            // Create and append the chart with current container width
+            const chartSvg = createLollipopChart(chartData, containerWidth);
             
             // Clear the container and add the chart
             container.innerHTML = '';
             container.appendChild(chartSvg);
-            
-            // No need to add CSS since you already have it in your stylesheet
-            console.log("Using existing CSS stylesheet for chart styling");
             
             // Add simple tooltip functionality
             document.querySelectorAll('[data-tooltip]').forEach(element => {
@@ -433,14 +486,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Add a small indicator to show when the chart was last updated
-            const updateIndicator = document.createElement('div');
-            updateIndicator.id = 'chart-update-indicator';
-            updateIndicator.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+               // const updateIndicator = document.createElement('div');
+               // updateIndicator.id = 'chart-update-indicator';
+               // updateIndicator.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
             
-            container.appendChild(updateIndicator);
+              //  container.appendChild(updateIndicator);
             
-            console.log("Chart generation complete");
-            return true; // Indicate successful chart generation
+               // console.log("Chart generation complete");
+               // return true; // Indicate successful chart generation
             
         } catch (error) {
             console.error('Error generating chart:', error);
@@ -449,3 +502,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+

@@ -62,54 +62,45 @@ document.addEventListener('DOMContentLoaded', function() {
         feedback: false
     };
     
-    // Improved button click handler function that handles event propagation
-    function handleButtonClick(button, container, sectionKey) {
-        return function(event) {
-            // Stop event propagation to prevent issues
-            event.stopPropagation();
+    // Improved button click handlers with better event delegation
+    function handleButtonClick(button, container, sectionName) {
+        return function(e) {
+            e.preventDefault(); // Prevent default behavior
+            e.stopPropagation(); // Stop event bubbling
             
-            // Make sure we're handling the click on the button itself
-            const isVisible = container.classList.contains('active');
+            // Get computed style to check visibility reliably
+            const computedStyle = window.getComputedStyle(container);
+            const isVisible = computedStyle.display !== 'none';
             
-            // Toggle visibility using classes instead of direct style manipulation
+            // Toggle visibility with reliable checks
             if (isVisible) {
-                container.classList.remove('active');
                 container.style.display = 'none';
-                sectionsVisible[sectionKey] = false;
-                button.classList.remove('selected-button');
+                sectionsVisible[sectionName] = false;
+                button.style.backgroundColor = '';
             } else {
-                container.classList.add('active');
                 container.style.display = 'block';
-                sectionsVisible[sectionKey] = true;
-                button.classList.add('selected-button');
+                sectionsVisible[sectionName] = true;
+                button.style.backgroundColor = '#2a9d8f';
             }
             
+            // Update submit button visibility
             updateSubmitButtonVisibility();
         };
     }
     
-    // Apply improved event handlers
+    // Use improved event handlers with proper binding
     ageButton.addEventListener('click', handleButtonClick(ageButton, ageContainer, 'age'));
     locationButton.addEventListener('click', handleButtonClick(locationButton, locationContainer, 'location'));
     feedbackButton.addEventListener('click', handleButtonClick(feedbackButton, feedbackContainer, 'feedback'));
     
-    // Event delegation for any child elements inside buttons
-    // This ensures clicks on any part of the button (like text) still trigger the button
-    [ageButton, locationButton, feedbackButton].forEach(button => {
-        const children = button.querySelectorAll('*');
-        children.forEach(child => {
-            child.addEventListener('click', function(event) {
-                // Prevent the event from bubbling up to parent elements
-                event.stopPropagation();
-                // Trigger a click on the parent button
-                button.click();
-            });
-        });
-    });
+    // Add touchstart event listeners for mobile devices
+    ageButton.addEventListener('touchstart', handleButtonClick(ageButton, ageContainer, 'age'));
+    locationButton.addEventListener('touchstart', handleButtonClick(locationButton, locationContainer, 'location'));
+    feedbackButton.addEventListener('touchstart', handleButtonClick(feedbackButton, feedbackContainer, 'feedback'));
     
-    // Update form data when inputs change
+    // Update form data when inputs change with proper validation
     ageInput.addEventListener('input', function() {
-        formData.age = this.value;
+        formData.age = this.value.trim();
         updateSubmitButtonVisibility();
     });
     
@@ -118,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSubmitButtonVisibility();
     });
     
+    // Improved radio button handling
     feedbackRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             formData.feedback = this.value;
@@ -125,58 +117,112 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Show submit button only if all three questions are answered
+    // Show submit button only if all visible sections are answered
     function updateSubmitButtonVisibility() {
-        // Check if all three form fields have values
-        const allQuestionsAnswered = formData.age !== '' && 
-                                     formData.location !== '' && 
-                                     formData.feedback !== '';
+        // Initialize flags for validation
+        let ageValid = true;
+        let locationValid = true;
+        let feedbackValid = true;
         
-        // Only show submit if all questions are answered
-        submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
+        // Only validate sections that are visible
+        if (sectionsVisible.age) {
+            ageValid = formData.age !== '';
+        }
+        
+        if (sectionsVisible.location) {
+            locationValid = formData.location !== '';
+        }
+        
+        if (sectionsVisible.feedback) {
+            feedbackValid = formData.feedback !== '';
+        }
+        
+        // Show submit button if all visible sections are valid AND at least one section is visible
+        const anySectionVisible = sectionsVisible.age || sectionsVisible.location || sectionsVisible.feedback;
+        const allVisibleSectionsValid = ageValid && locationValid && feedbackValid;
+        
+        submitContainer.style.display = (anySectionVisible && allVisibleSectionsValid) ? 'block' : 'none';
     }
     
     // Function to send data to Google Form
     function sendToGoogleForm(data) {
+        // Only send data for visible sections
+        const dataToSend = {};
+        
+        if (sectionsVisible.age) {
+            dataToSend.age = data.age;
+        }
+        
+        if (sectionsVisible.location) {
+            dataToSend.location = data.location;
+        }
+        
+        if (sectionsVisible.feedback) {
+            dataToSend.feedback = data.feedback;
+        }
+        
         // Form submission URL
         const formUrl = "https://docs.google.com/forms/d/10hTG8qn5GtfG18Tg_b7isYTZ1spRt21vNSyqSt1rbwk/formResponse";
         
         // Create a FormData object with the correct entry IDs
         const formData = new FormData();
-        formData.append('entry.168865574', data.age);         // Age field
-        formData.append('entry.2085059612', data.location);   // Location field
-        formData.append('entry.2116187728', data.feedback);   // Feedback field
+        
+        // Only append fields that have values
+        if (dataToSend.age) {
+            formData.append('entry.168865574', dataToSend.age);
+        }
+        
+        if (dataToSend.location) {
+            formData.append('entry.2085059612', dataToSend.location);
+        }
+        
+        if (dataToSend.feedback) {
+            formData.append('entry.2116187728', dataToSend.feedback);
+        }
         
         // Create an invisible iframe to submit the form (avoids CORS issues)
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
         
-        // Set up form in iframe
+        // Set up form in iframe with error handling
         iframe.onload = function() {
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const form = iframeDoc.createElement('form');
-            form.method = 'POST';
-            form.action = formUrl;
-            
-            // Add form data
-            for (const [key, value] of formData.entries()) {
-                const input = iframeDoc.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const form = iframeDoc.createElement('form');
+                form.method = 'POST';
+                form.action = formUrl;
+                
+                // Add form data
+                for (const [key, value] of formData.entries()) {
+                    const input = iframeDoc.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+                
+                // Add form to iframe and submit
+                iframeDoc.body.appendChild(form);
+                form.submit();
+                console.log('Form submitted!', dataToSend);
+                
+                // Clean up after submission
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            } catch (error) {
+                console.error('Form submission error:', error);
+                // Still show thank you message even if there's an error
+                showThankYouMessage();
             }
-            
-            // Add form to iframe and submit
-            iframeDoc.body.appendChild(form);
-            form.submit();
-            console.log('Form submitted!', data);
-            
-            // Clean up after submission
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
+        };
+        
+        // Handle iframe loading errors
+        iframe.onerror = function() {
+            console.error('Form iframe loading error');
+            // Still show thank you message even if there's an error
+            showThankYouMessage();
         };
         
         // Set src to about:blank to trigger onload
@@ -193,20 +239,21 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             if (document.getElementById('lollipop-chart-container') && 
                 typeof window.generateAgeLollipopChart === 'function') {
-                window.generateAgeLollipopChart('lollipop-chart-container');
-                console.log('Chart update triggered after form submission');
+                try {
+                    window.generateAgeLollipopChart('lollipop-chart-container');
+                    console.log('Chart update triggered after form submission');
+                } catch (error) {
+                    console.error('Chart update error:', error);
+                }
             }
-        }, 1000); // 1 second delay to allow time for Google Form submission to update the sheet
+        }, 1500); // 1.5 seconds delay to allow time for Google Form submission to update the sheet
+        
+        // Show thank you message
+        showThankYouMessage();
     }
-
-    // Improved submit button handler with stopPropagation
-    submitButton.addEventListener('click', function(event) {
-        // Stop event propagation
-        event.stopPropagation();
-        
-        // Use the form submission handler that will also update the chart
-        handleFormSubmission(formData);
-        
+    
+    // Function to show thank you message and reset form
+    function showThankYouMessage() {
         // Show thank you message
         thankYouMessage.style.display = 'block';
         submitContainer.style.display = 'none';
@@ -221,16 +268,48 @@ document.addEventListener('DOMContentLoaded', function() {
         sectionsVisible.location = false;
         sectionsVisible.feedback = false;
         
-        // Reset button colors by removing classes
-        ageButton.classList.remove('selected-button');
-        locationButton.classList.remove('selected-button');
-        feedbackButton.classList.remove('selected-button');
+        // Reset button colors
+        ageButton.style.backgroundColor = '';
+        locationButton.style.backgroundColor = '';
+        feedbackButton.style.backgroundColor = '';
+    }
+
+    // Handle form submission with debounce to prevent double-clicks
+    let isSubmitting = false;
+    submitButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Prevent multiple submissions
+        if (isSubmitting) return;
+        
+        isSubmitting = true;
+        
+        // Use the form submission handler
+        handleFormSubmission(formData);
+        
+        // Reset submission state after a delay
+        setTimeout(() => {
+            isSubmitting = false;
+        }, 2000);
+    });
+    
+    // Add touchstart event for mobile devices
+    submitButton.addEventListener('touchstart', function(e) {
+        if (!isSubmitting) {
+            e.preventDefault();
+            submitButton.click();
+        }
     });
 
-    // Initialize - hide all inputs
+    // Initialize - hide all inputs and ensure proper state
     ageContainer.style.display = 'none';
     locationContainer.style.display = 'none';
     feedbackContainer.style.display = 'none';
     submitContainer.style.display = 'none';
     thankYouMessage.style.display = 'none';
+    
+    // Reset any lingering button colors on page load
+    ageButton.style.backgroundColor = '';
+    locationButton.style.backgroundColor = '';
+    feedbackButton.style.backgroundColor = '';
 });
