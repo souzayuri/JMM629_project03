@@ -177,11 +177,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return chartData.sort((a, b) => b.avgAge - a.avgAge);
     }
     
-    // Function to estimate text width
+    // IMPROVED: Function to estimate text width more accurately
     function estimateTextWidth(text, fontSize) {
-        // This is a rough estimate - character width varies by font and character
-        const avgCharWidth = fontSize * 0.6; // Average character width as a factor of font size
-        return text.length * avgCharWidth;
+        // This is a more generous estimate based on the font characteristics
+        // Increase the average character width multiplier for better accommodation
+        const avgCharWidth = fontSize * 0.8; // Increased from 0.6 to 0.8
+        // Add padding to account for varying character widths
+        const padding = fontSize * 2; // Additional padding
+        return text.length * avgCharWidth + padding;
     }
     
     // Create the lollipop chart SVG
@@ -207,27 +210,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log("Creating chart with data:", chartData);
         
-        // SVG dimensions and margins - now based on container width
-        const width = containerWidth || 800; // Default to 800 if containerWidth is not provided
-        const height = Math.min(600, Math.max(400, width * 0.75)); // Responsive height based on width
+        // Base dimensions
+        const baseWidth = containerWidth || 800; // Default to 800 if containerWidth is not provided
         
         // Calculate left margin based on longest country name
-        const baseFontSize = width < 500 ? 12 : 14;
+        const baseFontSize = baseWidth < 500 ? 12 : 14;
         const longestCountryName = chartData.reduce((longest, d) => 
             d.country.length > longest.length ? d.country : longest, "");
         console.log("Longest country name:", longestCountryName, "Length:", longestCountryName.length);
         
-        // Estimate text width of longest country name
+        // IMPROVED: Estimate text width of longest country name with more generous parameters
         const estimatedLabelWidth = estimateTextWidth(longestCountryName, baseFontSize);
         console.log("Estimated label width:", estimatedLabelWidth);
         
-        // Adjust margins based on screen size and longest country name
+        // IMPROVED: Calculate required left margin
+        const requiredLeftMargin = Math.max(120, estimatedLabelWidth + 40); // Increased minimum and padding
+        
+        // Now adjust overall SVG dimensions to maintain chart size despite larger margin
+        // Add the difference between required margin and standard margin to maintain chart area
+        const width = baseWidth + (requiredLeftMargin - 100); 
+        const height = Math.min(600, Math.max(400, baseWidth * 0.75)); // Keep height based on original width
+        
+        console.log("Original width:", baseWidth, "Adjusted width:", width);
+        
+        // IMPROVED: Adjust margins based on screen size and longest country name with extra buffer
         const margin = { 
-            top: Math.max(20, width * 0.05), 
-            right: Math.max(60, width * 0.15), 
-            // Dynamically calculate left margin with padding and minimum size
-            left: Math.max(100, estimatedLabelWidth + 20), 
-            bottom: Math.max(40, width * 0.075) 
+            top: Math.max(20, baseWidth * 0.05), 
+            right: Math.max(60, baseWidth * 0.15), 
+            left: requiredLeftMargin, // Use the calculated margin
+            bottom: Math.max(40, baseWidth * 0.075) 
         };
         
         console.log("Calculated left margin:", margin.left);
@@ -251,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', height);
         svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        svg.setAttribute('preserveAspectRatio', 'xMinYMid meet'); // Changed from xMidYMid to xMinYMid to better align the chart
         svg.style.display = 'block'; // Ensure the SVG is displayed as block
         svg.style.margin = '0 auto'; // Center the SVG
         

@@ -40,28 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submit-button');
     const thankYouMessage = document.getElementById('thank-you');
     
-    // Track form submission
+    // Add flag to track if form has been submitted
     let formSubmitted = false;
     
-    // Store submission status in sessionStorage to persist across script re-execution
-    if (sessionStorage.getItem('formSubmitted') === 'true') {
-        formSubmitted = true;
-        
-        // If form was already submitted, show thank you and hide inputs
-        thankYouMessage.style.display = 'block';
-        ageContainer.style.display = 'none';
-        locationContainer.style.display = 'none';
-        feedbackContainer.style.display = 'none';
-        submitContainer.style.display = 'none';
-        
-        // Also disable the buttons
-        ageButton.disabled = true;
-        locationButton.disabled = true;
-        feedbackButton.disabled = true;
-        ageButton.style.opacity = '0.5';
-        locationButton.style.opacity = '0.5';
-        feedbackButton.style.opacity = '0.5';
-    }
+    // Clear submission state on page load/refresh
+    sessionStorage.removeItem('formSubmitted');
     
     // Populate the country dropdown
     countries.forEach(country => {
@@ -103,8 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Toggle sections when buttons are clicked
     ageButton.addEventListener('click', function() {
-        // Skip if form already submitted
-        if (formSubmitted) return;
+        // If form is already submitted, don't allow changes
+        if (formSubmitted) {
+            alert('Form has already been submitted. Please refresh the page to submit again.');
+            return;
+        }
         
         // If this container is already visible, hide it
         if (ageContainer.style.display === 'block') {
@@ -123,8 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     locationButton.addEventListener('click', function() {
-        // Skip if form already submitted
-        if (formSubmitted) return;
+        // If form is already submitted, don't allow changes
+        if (formSubmitted) {
+            alert('Form has already been submitted. Please refresh the page to submit again.');
+            return;
+        }
         
         // If this container is already visible, hide it
         if (locationContainer.style.display === 'block') {
@@ -143,8 +132,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     feedbackButton.addEventListener('click', function() {
-        // Skip if form already submitted
-        if (formSubmitted) return;
+        // If form is already submitted, don't allow changes
+        if (formSubmitted) {
+            alert('Form has already been submitted. Please refresh the page to submit again.');
+            return;
+        }
         
         // If this container is already visible, hide it
         if (feedbackContainer.style.display === 'block') {
@@ -164,16 +156,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update form data when inputs change
     ageInput.addEventListener('input', function() {
-        // Skip if form already submitted
-        if (formSubmitted) return;
+        // If form is already submitted, don't allow changes
+        if (formSubmitted) {
+            alert('Form has already been submitted. Please refresh the page to submit again.');
+            this.value = formData.age; // Reset to previous value
+            return;
+        }
         
         formData.age = this.value;
         updateSubmitButtonVisibility();
     });
     
     locationSelect.addEventListener('change', function() {
-        // Skip if form already submitted
-        if (formSubmitted) return;
+        // If form is already submitted, don't allow changes
+        if (formSubmitted) {
+            alert('Form has already been submitted. Please refresh the page to submit again.');
+            this.value = formData.location; // Reset to previous value
+            return;
+        }
         
         formData.location = this.value;
         updateSubmitButtonVisibility();
@@ -181,8 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     feedbackRadios.forEach(radio => {
         radio.addEventListener('change', function() {
-            // Skip if form already submitted
-            if (formSubmitted) return;
+            // If form is already submitted, don't allow changes
+            if (formSubmitted) {
+                alert('Form has already been submitted. Please refresh the page to submit again.');
+                // Reset to previous selection
+                feedbackRadios.forEach(r => {
+                    r.checked = (r.value === formData.feedback);
+                });
+                return;
+            }
             
             formData.feedback = this.value;
             updateSubmitButtonVisibility();
@@ -191,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show submit button only if all three questions are answered
     function updateSubmitButtonVisibility() {
-        // If form already submitted, always hide submit button
+        // Don't show submit if form is already submitted
         if (formSubmitted) {
             submitContainer.style.display = 'none';
             return;
@@ -238,31 +245,29 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         e.stopPropagation();
         
-        // Don't allow resubmission
+        // If form is already submitted, don't allow resubmission
         if (formSubmitted) {
-            console.log("Form already submitted, ignoring click");
+            alert('Form has already been submitted. Please refresh the page to submit again.');
             return;
         }
         
         console.log("Submit button clicked");
         
-        // Mark form as submitted
-        formSubmitted = true;
-        
-        // Store submission status in sessionStorage
-        sessionStorage.setItem('formSubmitted', 'true');
-        
-        // Disable the buttons
-        ageButton.disabled = true;
-        locationButton.disabled = true;
-        feedbackButton.disabled = true;
-        ageButton.style.opacity = '0.5';
-        locationButton.style.opacity = '0.5';
-        feedbackButton.style.opacity = '0.5';
-        
         // Use the form submission function
         sendToGoogleForm(formData);
         
+        // Mark form as submitted
+        formSubmitted = true;
+        
+        // Store submission state in local variable only, not in session storage
+        // We're no longer using sessionStorage.setItem('formSubmitted', 'true');
+        
+        // Show thank you message and hide form elements
+        showThankYouState();
+    });
+    
+    // Function to show the thank you state
+    function showThankYouState() {
         // Show thank you message
         thankYouMessage.style.display = 'block';
         submitContainer.style.display = 'none';
@@ -281,7 +286,25 @@ document.addEventListener('DOMContentLoaded', function() {
         ageButton.style.backgroundColor = '';
         locationButton.style.backgroundColor = '';
         feedbackButton.style.backgroundColor = '';
-    });
+        
+        // Disable all form elements
+        ageInput.disabled = true;
+        locationSelect.disabled = true;
+        feedbackRadios.forEach(radio => radio.disabled = true);
+        
+        // Add this new code to refresh the chart after form submission
+        const chartContainer = document.getElementById('lollipop-chart-container');
+        if (chartContainer) {
+            // Remove the rendered flag to allow re-rendering
+            chartContainer.removeAttribute('data-chart-rendered');
+            // Call the chart generation function
+            if (window.generateAgeLollipopChart) {
+                setTimeout(() => {
+                    window.generateAgeLollipopChart('lollipop-chart-container');
+                }, 1000); // Give time for the form data to be processed
+            }
+        }
+    }
     
     // Function to send data to Google Form
     function sendToGoogleForm(data) {
@@ -334,13 +357,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize - hide all inputs
-    if (!formSubmitted) {
-        ageContainer.style.display = 'none';
-        locationContainer.style.display = 'none';
-        feedbackContainer.style.display = 'none';
-        submitContainer.style.display = 'none';
-        thankYouMessage.style.display = 'none';
-    }
+    ageContainer.style.display = 'none';
+    locationContainer.style.display = 'none';
+    feedbackContainer.style.display = 'none'
+    submitContainer.style.display = 'none';
+    thankYouMessage.style.display = 'none';
     
     // Initialize the button position based on screen size
     updateSubmitButtonPosition();
