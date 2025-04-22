@@ -66,6 +66,133 @@ body {
   outline-offset: 2px;
 }
 
+/* ==============================================
+  16. LOLLIPOP
+=============================================== */
+
+/* Fix for any potential overflow issues */
+#lollipop-chart-container {
+  overflow: visible;
+  position: relative;
+  margin-bottom: 30px; /* Add space below the chart */
+}
+
+/* General fixes for clickable elements */
+button, 
+select, 
+input[type="radio"],
+input[type="text"],
+input[type="number"] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure form sections don't get hidden behind SVG elements */
+#age-container,
+#location-container,
+#feedback-container {
+  position: relative;
+  z-index: 90;
+}
+
+/* Chart elements */
+.lollipop-circle {
+  fill: #FF6B6B;
+  stroke: #A6D6D6;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+
+.lollipop-circle:hover {
+  fill: #A6D6D6;
+}
+
+.lollipop-stick {
+  stroke: #A6D6D6;
+  stroke-width: 2;
+}
+
+/* Count display elements */
+.count-text {
+  font-size: 20px;
+  font-weight: bold;
+  fill: #fffaf0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.count-background {
+  fill: #ff6b6bc3;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  fill-opacity: 0.5;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: #333;
+  padding: 2px;
+  border-radius: 4px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Axis elements */
+.axis-line {
+  stroke: #A6D6D6;
+  stroke-width: 1;
+}
+
+.axis-tick {
+  stroke: #A6D6D6;
+  stroke-width: 1;
+}
+
+.axis-label {
+  font-size: 14px;
+  text-anchor: middle;
+  font-family: 'Bungee', Arial, sans-serif;
+  fill: #fff1f1;
+}
+
+.x-axis-title {
+  font-size: 14px;
+  text-anchor: middle;
+  font-weight: bold;
+  font-family: 'Bungee', Arial, sans-serif;
+  fill: #2f2832cc;
+}
+
+.country-label {
+  font-size: 16px;
+  text-anchor: end;
+  font-family: 'Bungee', Arial, sans-serif;
+  fill:#2f2832cc;
+}
+
+.range-label {
+  font-size: 14px;
+  fill: #fffaf0;
+}
+
+/* Other elements */
+.no-data-text {
+  text-anchor: middle;
+  font-size: 16px;
+  fill: #333;
+  font-family: 'Bungee', Arial, sans-serif;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #fffaf0;
+  font-style: italic;
+}
+}
       
 /* ==============================================
    2. TYPOGRAPHY & TEXT EFFECTS
@@ -1117,136 +1244,4 @@ video {
   transition: transform 0.2s, box-shadow 0.2s;
   animation: pulse 1.5s infinite;
   pointer-events: auto !important;
-}
-
-
-/* ==============================================
-  16. LOLLIPOP
-=============================================== */
-
-/* Fix for any potential overflow issues */
-#lollipop-chart-container {
-  overflow: visible;
-  position: relative;
-  margin-bottom: 30px; /* Add space below the chart */
-  min-width: auto;
-}
-
-/* General fixes for clickable elements */
-button, 
-select, 
-input[type="radio"],
-input[type="text"],
-input[type="number"] {
-  cursor: pointer !important;
-  pointer-events: auto !important;
-}
-
-/* Ensure form sections don't get hidden behind SVG elements */
-#age-container,
-#location-container,
-#feedback-container {
-  position: relative;
-  z-index: 90;
-}
-
-/* Chart elements */
-.lollipop-circle {
-  fill: #FF6B6B;
-  stroke: #A6D6D6;
-  stroke-width: 1;
-  cursor: pointer;
-  transition: fill 0.2s ease;
-}
-
-.lollipop-circle:hover {
-  fill: #A6D6D6;
-}
-
-.lollipop-stick {
-  stroke: #A6D6D6;
-  stroke-width: 2;
-}
-
-/* Count display elements */
-.count-text {
-  font-size: 20px;
-  font-weight: bold;
-  fill: #fffaf0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.count-background {
-  fill: #ff6b6bc3;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-  fill-opacity: 0.5;
-}
-
-/* Tooltip */
-.tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  color: #333;
-  padding: 2px;
-  border-radius: 4px;
-  z-index: 100;
-  pointer-events: none;
-}
-
-/* Axis elements */
-.axis-line {
-  stroke: #A6D6D6;
-  stroke-width: 1;
-}
-
-.axis-tick {
-  stroke: #A6D6D6;
-  stroke-width: 1;
-}
-
-.axis-label {
-  font-size: 14px;
-  text-anchor: middle;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #fff1f1;
-}
-
-.x-axis-title {
-  font-size: 14px;
-  text-anchor: middle;
-  font-weight: bold;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #2f2832cc;
-}
-
-.country-label {
-  font-size: 16px;
-  text-anchor: end;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill:#2f2832cc;
-  text-anchor: end; /* Ensure text aligns to the right edge */
-  dominant-baseline: middle;
-}
-
-.range-label {
-  font-size: 14px;
-  fill: #fffaf0;
-}
-
-/* Other elements */
-.no-data-text {
-  text-anchor: middle;
-  font-size: 16px;
-  fill: #333;
-  font-family: 'Bungee', Arial, sans-serif;
-}
-
-.loading-indicator {
-  text-align: center;
-  padding: 20px;
-  color: #fffaf0;
-  font-style: italic;
-}
 }
