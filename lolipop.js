@@ -1,11 +1,73 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // If there's a chart container on the page, initialize the visualization
+    console.log("Lollipop chart script loaded");
+    
+    // Register a MutationObserver to watch for changes to the chart container visibility
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && 
+                (mutation.attributeName === 'style' || mutation.attributeName === 'class')) {
+                const chartContainer = document.getElementById('lollipop-chart-container');
+                if (chartContainer && isElementVisible(chartContainer) && 
+                    !chartContainer.hasAttribute('data-chart-rendered')) {
+                    console.log("Chart container is now visible, rendering chart");
+                    generateAgeLollipopChart('lollipop-chart-container');
+                    chartContainer.setAttribute('data-chart-rendered', 'true');
+                }
+            }
+        });
+    });
+    
+    // Also check on window resize as this can trigger layout changes
+    window.addEventListener('resize', function() {
+        const chartContainer = document.getElementById('lollipop-chart-container');
+        if (chartContainer && isElementVisible(chartContainer) && 
+            !chartContainer.hasAttribute('data-chart-rendered')) {
+            console.log("Chart container is now visible after resize, rendering chart");
+            generateAgeLollipopChart('lollipop-chart-container');
+            chartContainer.setAttribute('data-chart-rendered', 'true');
+        }
+    });
+    
+    // Check if step visibility changes (for scrollytelling)
+    document.querySelectorAll('.step').forEach(function(step) {
+        observer.observe(step, { attributes: true });
+    });
+    
+    // Function to check if an element is visible
+    function isElementVisible(element) {
+        if (!element) return false;
+        const style = window.getComputedStyle(element);
+        if (style.display === 'none') return false;
+        if (style.visibility === 'hidden') return false;
+        if (parseFloat(style.opacity) === 0) return false;
+        
+        // Check if element has dimensions
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return false;
+        
+        return true;
+    }
+    
+    // Check for the chart container on initial load
     const chartContainer = document.getElementById('lollipop-chart-container');
     if (chartContainer) {
-        // Generate chart immediately on page load
-        generateAgeLollipopChart('lollipop-chart-container');
+        if (isElementVisible(chartContainer)) {
+            console.log("Chart container visible on initial load, rendering immediately");
+            generateAgeLollipopChart('lollipop-chart-container');
+            chartContainer.setAttribute('data-chart-rendered', 'true');
+        } else {
+            console.log("Chart container exists but not visible yet, will render when visible");
+            // Also set up a backup timeout in case other detection methods fail
+            setTimeout(function() {
+                if (!chartContainer.hasAttribute('data-chart-rendered')) {
+                    console.log("Rendering chart via timeout fallback");
+                    generateAgeLollipopChart('lollipop-chart-container');
+                    chartContainer.setAttribute('data-chart-rendered', 'true');
+                }
+            }, 2000); // 2 second fallback
+        }
     }
-
+    
     // Make the function globally available
     window.generateAgeLollipopChart = generateAgeLollipopChart;
     
@@ -21,11 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&cacheBuster=${cacheBuster}`;
         
         try {
+            console.log("Fetching spreadsheet data from:", url);
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const csvText = await response.text();
+            console.log("Received CSV data length:", csvText.length);
             
             // Parse CSV
             return parseCSV(csvText);
@@ -39,9 +103,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function parseCSV(csvText) {
         // Simple CSV parser
         const rows = csvText.split('\n');
-        const headers = rows[0].split(',').map(header => header.replace(/"/g, '').trim());
+        console.log("CSV rows found:", rows.length);
         
-        return rows.slice(1).map(row => {
+        if (rows.length <= 1) {
+            console.warn("CSV data appears to be empty or malformed");
+            return [];
+        }
+        
+        const headers = rows[0].split(',').map(header => header.replace(/"/g, '').trim());
+        console.log("CSV headers:", headers);
+        
+        const data = rows.slice(1).map(row => {
             const values = row.split(',').map(value => value.replace(/"/g, '').trim());
             const entry = {};
             
@@ -51,6 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return entry;
         });
+        
+        console.log("Parsed CSV data items:", data.length);
+        return data;
     }
     
     // Process data for visualization
@@ -80,6 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        console.log("Countries found:", Object.keys(countrySummary).length);
+        
         // Calculate average ages and prepare final data
         const chartData = Object.keys(countrySummary).map(country => {
             const summary = countrySummary[country];
@@ -103,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createLollipopChart(chartData) {
         // Check if there's data to display
         if (!chartData || chartData.length === 0) {
+            console.warn("No chart data available");
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', 800);
             svg.setAttribute('height', 600);
@@ -111,11 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
             noDataText.setAttribute('x', 400);
             noDataText.setAttribute('y', 300);
             noDataText.setAttribute('class', 'no-data-text');
+            noDataText.setAttribute('text-anchor', 'middle');
             noDataText.textContent = 'No data available yet. Submit the form to see results!';
             svg.appendChild(noDataText);
             
             return svg;
         }
+        
+        console.log("Creating chart with data:", chartData);
         
         // SVG dimensions and margins
         const width = 800;
@@ -126,12 +207,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Only take top 15 countries if there are many
         const displayData = chartData.slice(0, 15);
+        console.log("Displaying top countries:", displayData.length);
         
         // SVG container
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', width);
         svg.setAttribute('height', height);
         svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.style.display = 'block'; // Ensure the SVG is displayed as block
+        svg.style.margin = '0 auto'; // Center the SVG
         
         // Define scales
         const xMax = Math.max(...displayData.map(d => d.maxAge), 100);
@@ -139,13 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const yScale = innerHeight / displayData.length;
         
-        // Add title
-        //const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        //title.setAttribute('x', width / 2);
-        //title.setAttribute('y', 30);
-        //title.setAttribute('class', 'chart-title');
-        //title.textContent = 'Age Ranges by Country';
-        //svg.appendChild(title);
+        // Chart title removed as requested
         
         // Create a group for the chart content
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -183,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
             label.setAttribute('x', tickX);
             label.setAttribute('y', 20);
             label.setAttribute('class', 'axis-label');
+            label.setAttribute('text-anchor', 'middle');
             label.textContent = i;
             xAxis.appendChild(label);
         }
@@ -192,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xLabel.setAttribute('x', innerWidth / 2);
         xLabel.setAttribute('y', 50);
         xLabel.setAttribute('class', 'x-axis-title');
+        xLabel.setAttribute('text-anchor', 'middle');
         xLabel.textContent = 'Age';
         xAxis.appendChild(xLabel);
         
@@ -219,14 +299,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', d.avgAge * xScale);
             circle.setAttribute('cy', yPos);
-            circle.setAttribute('r', Math.min(10, Math.max(5, d.count * 2))); // Size based on count, with limits
+            circle.setAttribute('r', Math.min(10, Math.max(5, d.count * 1.5))); // Size based on count, with limits
             circle.setAttribute('class', 'lollipop-circle');
+            circle.setAttribute('data-count', d.count);
             
             // Tooltip on hover - keep existing tooltip data
             circle.setAttribute('data-tooltip', `${d.country}: Avg Age ${d.avgAge}, Range ${d.minAge}-${d.maxAge}, Count: ${d.count}`);
             circleGroup.appendChild(circle);
             
-            // Create count display text that's initially hidden
+            // Create count display text that will be shown on hover
             const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             countText.setAttribute('x', d.avgAge * xScale);
             countText.setAttribute('y', yPos - 15); // Position above the circle
@@ -234,28 +315,31 @@ document.addEventListener('DOMContentLoaded', function() {
             countText.setAttribute('class', 'count-text');
             countText.style.opacity = '0'; // Hidden by default
             countText.textContent = d.count;
-            circleGroup.appendChild(countText);
             
             // Create count background for better visibility
             const countBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            const textBBox = countText.getBBox ? countText.getBBox() : { width: 20, height: 14 }; // Fallback if getBBox not available
-            countBackground.setAttribute('x', d.avgAge * xScale - textBBox.width/2 - 3);
-            countBackground.setAttribute('y', yPos - 15 - textBBox.height + 3);
-            countBackground.setAttribute('width', textBBox.width + 6);
-            countBackground.setAttribute('height', textBBox.height + 2);
+            const textWidth = String(d.count).length * 8 + 6; // Estimate text width
+            const textHeight = 16; // Estimate text height
+            
+            countBackground.setAttribute('x', d.avgAge * xScale - textWidth/2);
+            countBackground.setAttribute('y', yPos - 15 - textHeight/2);
+            countBackground.setAttribute('width', textWidth);
+            countBackground.setAttribute('height', textHeight);
             countBackground.setAttribute('rx', 3); // Rounded corners
             countBackground.setAttribute('class', 'count-background');
             countBackground.style.opacity = '0'; // Hidden by default
             
             // Insert background before text so text appears on top
-            circleGroup.insertBefore(countBackground, countText);
+            circleGroup.appendChild(countBackground);
+            circleGroup.appendChild(countText);
             
             // Country label
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.setAttribute('x', -10);
             label.setAttribute('y', yPos);
             label.setAttribute('class', 'country-label');
-            label.setAttribute('alignment-baseline', 'middle');
+            label.setAttribute('text-anchor', 'end');
+            label.setAttribute('dominant-baseline', 'middle');
             label.textContent = d.country;
             g.appendChild(label);
             
@@ -264,8 +348,8 @@ document.addEventListener('DOMContentLoaded', function() {
             rangeLabel.setAttribute('x', d.maxAge * xScale + 10);
             rangeLabel.setAttribute('y', yPos);
             rangeLabel.setAttribute('class', 'range-label');
-            rangeLabel.setAttribute('alignment-baseline', 'middle');
-            rangeLabel.textContent = `${d.minAge}-${d.maxAge} years (avg: ${d.avgAge})`;
+            rangeLabel.setAttribute('dominant-baseline', 'middle');
+            rangeLabel.textContent = `${d.minAge}-${d.maxAge} (avg: ${d.avgAge})`;
             g.appendChild(rangeLabel);
             
             // Add hover events to show/hide count
@@ -280,11 +364,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
+        console.log("Chart SVG created successfully");
         return svg;
     }
     
     // Main function to generate the chart
     async function generateAgeLollipopChart(containerId) {
+        console.log("Starting chart generation for container:", containerId);
         const container = document.getElementById(containerId);
         if (!container) {
             console.error(`Container with ID "${containerId}" not found.`);
@@ -306,6 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fetch and process data
             const data = await fetchSpreadsheetData();
             if (!data || data.length === 0) {
+                console.warn("No data returned from fetchSpreadsheetData");
                 container.innerHTML = 'No data available or error fetching data.';
                 return;
             }
@@ -319,11 +406,8 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.appendChild(chartSvg);
             
-            // Add link to external CSS file
-            const linkElement = document.createElement('link');
-            linkElement.rel = 'stylesheet';
-            linkElement.href = 'lollipop-chart-styles.css'; // Path to your CSS file
-            document.head.appendChild(linkElement);
+            // No need to add CSS since you already have it in your stylesheet
+            console.log("Using existing CSS stylesheet for chart styling");
             
             // Add simple tooltip functionality
             document.querySelectorAll('[data-tooltip]').forEach(element => {
@@ -341,7 +425,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     this.addEventListener('mouseout', function() {
-                        document.body.removeChild(tooltip);
+                        if (document.body.contains(tooltip)) {
+                            document.body.removeChild(tooltip);
+                        }
                     }, { once: true });
                 });
             });
@@ -353,6 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             container.appendChild(updateIndicator);
             
+            console.log("Chart generation complete");
             return true; // Indicate successful chart generation
             
         } catch (error) {
