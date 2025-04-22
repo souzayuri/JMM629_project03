@@ -25,6 +25,7 @@
 body {
   font-family: 'Bungee', cursive !important;
   margin: 0;
+}
 
 #submit-button:hover {
   animation: none;
@@ -193,7 +194,7 @@ input[type="number"] {
   color: #fffaf0;
   font-style: italic;
 }
-}
+
       
 /* ==============================================
    2. TYPOGRAPHY & TEXT EFFECTS
