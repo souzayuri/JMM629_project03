@@ -117,31 +117,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Show submit button only if all visible sections are answered
+    // Show submit button only if ALL three questions are answered
     function updateSubmitButtonVisibility() {
-        // Initialize flags for validation
-        let ageValid = true;
-        let locationValid = true;
-        let feedbackValid = true;
+        // Only show submit button if all three form fields have values
+        const allQuestionsAnswered = formData.age.trim() !== '' && 
+                                     formData.location !== '' && 
+                                     formData.feedback !== '';
         
-        // Only validate sections that are visible
-        if (sectionsVisible.age) {
-            ageValid = formData.age !== '';
-        }
+        // The submit button is only shown when all questions are answered
+        submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
         
-        if (sectionsVisible.location) {
-            locationValid = formData.location !== '';
-        }
-        
-        if (sectionsVisible.feedback) {
-            feedbackValid = formData.feedback !== '';
-        }
-        
-        // Show submit button if all visible sections are valid AND at least one section is visible
-        const anySectionVisible = sectionsVisible.age || sectionsVisible.location || sectionsVisible.feedback;
-        const allVisibleSectionsValid = ageValid && locationValid && feedbackValid;
-        
-        submitContainer.style.display = (anySectionVisible && allVisibleSectionsValid) ? 'block' : 'none';
+        // Log validation status for debugging
+        console.log('Form validation status:', {
+            ageValid: formData.age.trim() !== '',
+            locationValid: formData.location !== '', 
+            feedbackValid: formData.feedback !== '',
+            allQuestionsAnswered,
+            showSubmit: allQuestionsAnswered
+        });
     }
     
     // Function to send data to Google Form
