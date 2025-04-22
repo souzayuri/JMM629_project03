@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return chartData.sort((a, b) => b.avgAge - a.avgAge);
     }
     
-    // NEW: Function to estimate text width
+    // Function to estimate text width
     function estimateTextWidth(text, fontSize) {
         // This is a rough estimate - character width varies by font and character
         const avgCharWidth = fontSize * 0.6; // Average character width as a factor of font size
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const width = containerWidth || 800; // Default to 800 if containerWidth is not provided
         const height = Math.min(600, Math.max(400, width * 0.75)); // Responsive height based on width
         
-        // NEW: Calculate left margin based on longest country name
+        // Calculate left margin based on longest country name
         const baseFontSize = width < 500 ? 12 : 14;
         const longestCountryName = chartData.reduce((longest, d) => 
             d.country.length > longest.length ? d.country : longest, "");
@@ -319,6 +319,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         g.appendChild(xAxis);
         
+        // Create a tooltip div that will be shared by all lollipops
+        // This is a more efficient approach than creating tooltips for each item
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.className = 'tooltip';
+        tooltipDiv.style.opacity = '0';
+        tooltipDiv.style.position = 'absolute';
+        tooltipDiv.style.pointerEvents = 'none';
+        tooltipDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        tooltipDiv.style.color = 'white';
+        tooltipDiv.style.padding = '5px';
+        tooltipDiv.style.borderRadius = '4px';
+        tooltipDiv.style.fontSize = '14px';
+        tooltipDiv.style.zIndex = '1000';
+        document.body.appendChild(tooltipDiv);
+        
         // Create lollipops for each country
         displayData.forEach((d, i) => {
             const yPos = i * yScale + yScale / 2;
@@ -335,6 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Create a group for the lollipop circle and count display
             const circleGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             circleGroup.setAttribute('class', 'lollipop-group');
+            
+            // Set data attributes directly on the group element for hover events
+            circleGroup.setAttribute('data-country', d.country);
+            circleGroup.setAttribute('data-avg-age', d.avgAge);
+            circleGroup.setAttribute('data-min-age', d.minAge);
+            circleGroup.setAttribute('data-max-age', d.maxAge);
+            circleGroup.setAttribute('data-count', d.count);
+            
             g.appendChild(circleGroup);
             
             // Calculate circle size based on count and available space
@@ -348,10 +371,8 @@ document.addEventListener('DOMContentLoaded', function() {
             circle.setAttribute('cy', yPos);
             circle.setAttribute('r', circleSize);
             circle.setAttribute('class', 'lollipop-circle');
-            circle.setAttribute('data-count', d.count);
             
-            // Tooltip on hover
-            circle.setAttribute('data-tooltip', `${d.country}: Avg Age ${d.avgAge}, Range ${d.minAge}-${d.maxAge}, Count: ${d.count}`);
+            // Add the circle to the group
             circleGroup.appendChild(circle);
             
             // Create count display text that will be shown on hover
@@ -424,15 +445,51 @@ document.addEventListener('DOMContentLoaded', function() {
             
             g.appendChild(rangeLabel);
             
-            // Add hover events to show/hide count
-            circleGroup.addEventListener('mouseenter', function() {
+            // Add hover events to the entire circle group for better interaction
+            circleGroup.addEventListener('mouseenter', function(e) {
+                // Show count text and background
                 countText.style.opacity = '1';
                 countBackground.style.opacity = '0.8';
+                
+                // Show tooltip with country data
+                const country = this.getAttribute('data-country');
+                const avgAge = this.getAttribute('data-avg-age');
+                const minAge = this.getAttribute('data-min-age');
+                const maxAge = this.getAttribute('data-max-age');
+                const count = this.getAttribute('data-count');
+                
+                // Position tooltip near the cursor but not directly under it
+                const svgRect = svg.getBoundingClientRect();
+                const tooltipX = e.clientX + 15;
+                const tooltipY = e.clientY - 15;
+                
+                tooltipDiv.innerHTML = `${country}: Avg Age ${avgAge}, Range ${minAge}-${maxAge}, Count: ${count}`;
+                tooltipDiv.style.left = `${tooltipX}px`;
+                tooltipDiv.style.top = `${tooltipY}px`;
+                tooltipDiv.style.opacity = '1';
+                
+                // Highlight the circle
+                circle.classList.add('active');
+            });
+            
+            circleGroup.addEventListener('mousemove', function(e) {
+                // Update tooltip position as mouse moves
+                const tooltipX = e.clientX + 15;
+                const tooltipY = e.clientY - 15;
+                tooltipDiv.style.left = `${tooltipX}px`;
+                tooltipDiv.style.top = `${tooltipY}px`;
             });
             
             circleGroup.addEventListener('mouseleave', function() {
+                // Hide count text and background
                 countText.style.opacity = '0';
                 countBackground.style.opacity = '0';
+                
+                // Hide tooltip
+                tooltipDiv.style.opacity = '0';
+                
+                // Remove highlight from circle
+                circle.classList.remove('active');
             });
         });
         
@@ -482,27 +539,12 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.appendChild(chartSvg);
             
-            // Add simple tooltip functionality
-            document.querySelectorAll('[data-tooltip]').forEach(element => {
-                element.addEventListener('mouseover', function(e) {
-                    const tooltip = document.createElement('div');
-                    tooltip.className = 'tooltip';
-                    tooltip.textContent = this.getAttribute('data-tooltip');
-                    tooltip.style.left = `${e.pageX + 10}px`;
-                    tooltip.style.top = `${e.pageY + 10}px`;
-                    document.body.appendChild(tooltip);
-                    
-                    this.addEventListener('mousemove', function(e) {
-                        tooltip.style.left = `${e.pageX + 10}px`;
-                        tooltip.style.top = `${e.pageY + 10}px`;
-                    });
-                    
-                    this.addEventListener('mouseout', function() {
-                        if (document.body.contains(tooltip)) {
-                            document.body.removeChild(tooltip);
-                        }
-                    }, { once: true });
-                });
+            // Clean up any existing tooltips on chart refresh
+            const oldTooltips = document.querySelectorAll('.tooltip');
+            oldTooltips.forEach(tooltip => {
+                if (tooltip.parentNode) {
+                    tooltip.parentNode.removeChild(tooltip);
+                }
             });
             
             console.log("Chart generation complete");
