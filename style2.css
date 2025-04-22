@@ -1115,18 +1115,18 @@
 
 /* Count display elements */
 .count-text {
-  font-size: 14px;
+  font-size: 20px;
   font-weight: bold;
   fill: #fffaf0;
   pointer-events: none;
   transition: opacity 0.2s ease;
-  font-family: 'Bungee', Arial, sans-serif;
 }
 
 .count-background {
-  fill: #333;
+  fill: #ff6b6bc3;
   transition: opacity 0.2s ease;
   pointer-events: none;
+  fill-opacity: 0.5;
 }
 
 /* Tooltip */
@@ -1134,9 +1134,8 @@
   position: absolute;
   background: rgba(0, 0, 0, 0.8);
   color: #333;
-  padding: 8px;
+  padding: 2px;
   border-radius: 4px;
-  font-size: 14px;
   z-index: 100;
   pointer-events: none;
 }
