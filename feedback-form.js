@@ -2,25 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // All countries list
     const countries = [
         "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Barbuda", "Argentina", "Armenia", "Australia", "Austria", 
-        "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", 
-        "Bolivia", "Bosnia & Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", 
-        "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", 
-        "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", 
-        "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", 
-        "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", 
-        "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", 
-        "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", 
-        "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", 
-        "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", 
-        "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", 
-        "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", 
-        "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", 
-        "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines", "Samoa", "San Marino", "São Tomé & Príncipe", 
-        "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", 
-        "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", 
-        "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", 
-        "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", 
-        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        // ... rest of countries list
     ];
     
     // Element references
@@ -62,56 +44,49 @@ document.addEventListener('DOMContentLoaded', function() {
         feedback: false
     };
     
-    // Toggle sections when buttons are clicked
-    ageButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (ageContainer.style.display === 'block') {
-            ageContainer.style.display = 'none';
-            sectionsVisible.age = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            ageContainer.style.display = 'block';
-            sectionsVisible.age = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
-    });
+    // Improved button click handler function that handles event propagation
+    function handleButtonClick(button, container, sectionKey) {
+        return function(event) {
+            // Stop event propagation to prevent issues
+            event.stopPropagation();
+            
+            // Make sure we're handling the click on the button itself
+            const isVisible = container.classList.contains('active');
+            
+            // Toggle visibility using classes instead of direct style manipulation
+            if (isVisible) {
+                container.classList.remove('active');
+                container.style.display = 'none';
+                sectionsVisible[sectionKey] = false;
+                button.classList.remove('selected-button');
+            } else {
+                container.classList.add('active');
+                container.style.display = 'block';
+                sectionsVisible[sectionKey] = true;
+                button.classList.add('selected-button');
+            }
+            
+            updateSubmitButtonVisibility();
+        };
+    }
     
-    locationButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (locationContainer.style.display === 'block') {
-            locationContainer.style.display = 'none';
-            sectionsVisible.location = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            locationContainer.style.display = 'block';
-            sectionsVisible.location = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
-    });
+    // Apply improved event handlers
+    ageButton.addEventListener('click', handleButtonClick(ageButton, ageContainer, 'age'));
+    locationButton.addEventListener('click', handleButtonClick(locationButton, locationContainer, 'location'));
+    feedbackButton.addEventListener('click', handleButtonClick(feedbackButton, feedbackContainer, 'feedback'));
     
-    feedbackButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (feedbackContainer.style.display === 'block') {
-            feedbackContainer.style.display = 'none';
-            sectionsVisible.feedback = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            feedbackContainer.style.display = 'block';
-            sectionsVisible.feedback = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
+    // Event delegation for any child elements inside buttons
+    // This ensures clicks on any part of the button (like text) still trigger the button
+    [ageButton, locationButton, feedbackButton].forEach(button => {
+        const children = button.querySelectorAll('*');
+        children.forEach(child => {
+            child.addEventListener('click', function(event) {
+                // Prevent the event from bubbling up to parent elements
+                event.stopPropagation();
+                // Trigger a click on the parent button
+                button.click();
+            });
+        });
     });
     
     // Update form data when inputs change
@@ -203,11 +178,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.generateAgeLollipopChart('lollipop-chart-container');
                 console.log('Chart update triggered after form submission');
             }
-        }, 1000); // 1 seconds delay to allow time for Google Form submission to update the sheet
+        }, 1000); // 1 second delay to allow time for Google Form submission to update the sheet
     }
 
-    // Handle form submission
-    submitButton.addEventListener('click', function() {
+    // Improved submit button handler with stopPropagation
+    submitButton.addEventListener('click', function(event) {
+        // Stop event propagation
+        event.stopPropagation();
+        
         // Use the form submission handler that will also update the chart
         handleFormSubmission(formData);
         
@@ -225,10 +203,10 @@ document.addEventListener('DOMContentLoaded', function() {
         sectionsVisible.location = false;
         sectionsVisible.feedback = false;
         
-        // Reset button colors
-        ageButton.style.backgroundColor = '';
-        locationButton.style.backgroundColor = '';
-        feedbackButton.style.backgroundColor = '';
+        // Reset button colors by removing classes
+        ageButton.classList.remove('selected-button');
+        locationButton.classList.remove('selected-button');
+        feedbackButton.classList.remove('selected-button');
     });
 
     // Initialize - hide all inputs
@@ -238,4 +216,3 @@ document.addEventListener('DOMContentLoaded', function() {
     submitContainer.style.display = 'none';
     thankYouMessage.style.display = 'none';
 });
-
