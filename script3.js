@@ -1735,6 +1735,3 @@ document.querySelectorAll('.video-container').forEach(container => {
         document.querySelectorAll('video').forEach(video => video.play());
     });
 });
-
-
-
