@@ -48,6 +48,7 @@ body {
   z-index: 100;
 }
 
+
 /* Make sure thank you message is visible */
 #thank-you {
   display: none;
