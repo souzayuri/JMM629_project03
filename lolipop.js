@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (width < 800) {
                 rangeLabel.textContent = `${d.minAge}-${d.maxAge}`;
             } else {
-                rangeLabel.textContent = `${d.minAge}-${d.maxAge} (avg: ${d.avgAge})`;
+                rangeLabel.textContent = `${d.minAge}-${d.maxAge} Years (avg: ${d.avgAge})`;
             }
             
             // Adjust font size for smaller screens
