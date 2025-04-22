@@ -134,36 +134,31 @@ function getRandomTapirName() {
     return "Esperta";
 }
 
-
-// Define text boxes with more responsive positioning
+// Define text boxes but don't add them to the document yet
 const textBoxes = [
     {
         id: "box-1",
         text: "Each of my toes represents<br>a biome allowing you<br>to select a tapir.<br>Let's use myself as an example.",
-        position: { top: "12%", left: "80%" },
-        mobilePosition: { top: "10px", left: "10px" }
+        position: { top: "12%", left: "80%" }
     },
     {
         id: "box-2",
-        text: "You'll see<br>the tapir's track on the map.<br>If you click on the line,<br>it'll display some information<br>about the tapir",
-        position: { top: "10%", left: "260%" },
-        mobilePosition: { top: "120px", left: "10px" }
+        text: "You'll' see<br>the tapir's track on the map.<br>If you click on the line,<br>it'll display some information<br>about the tapir",
+        position: { top: "10%", left: "260%" }
     },
     {
         id: "box-3",
         text: "You'll also be able to<br>visualize the total distance<br> walked for each hour throughout the day over the sampled time.",
-        position: { bottom: "20%", left: "100%" },
-        mobilePosition: { top: "230px", left: "10px" }
+        position: { bottom: "20%", left: "100%" }
     },
     {
         id: "box-4",
         text: "You can also switch<br>the map mode to a satellite view<br>by clicking on the satellite button <span class='icon-example'>🛰️</span><br>or return to the default view.<br>Use the home button <span class='icon-example'>⌂</span> to reset the map view.",
-        position: { bottom: "55%", left: "335%" },
-        mobilePosition: { top: "340px", left: "10px" }
+        position: { bottom: "55%", left: "335%" }
     }
 ];
 
-// Update the function to start the tutorial
+// Function to start the tutorial
 function startTutorial() {
     // Get the random name right when the tutorial starts
     const randomTapirName = getRandomTapirName();
@@ -180,18 +175,10 @@ function startTutorial() {
             .style("transform", "translateY(20px)")
             .html(box.text);
         
-        // Check screen width and apply appropriate positioning
-        if (window.innerWidth <= 767) {
-            // Apply mobile positioning
-            Object.entries(box.mobilePosition).forEach(([key, value]) => {
-                textBox.style(key, value);
-            });
-        } else {
-            // Apply desktop positioning
-            Object.entries(box.position).forEach(([key, value]) => {
-                textBox.style(key, value);
-            });
-        }
+        // Apply positioning
+        Object.entries(box.position).forEach(([key, value]) => {
+            textBox.style(key, value);
+        });
         
         // Add sequential animation timing
         setTimeout(() => {
@@ -200,18 +187,11 @@ function startTutorial() {
         }, 500 + (index * 500)); // Stagger the animations
     });
     
-    // Add exit button with responsive positioning
+    // Add exit button
     const exitButton = tutorialContainer.append("button")
         .attr("class", "restart-btn")
         .text("Exit Tutorial")
         .style("opacity", "0");
-    
-    // Position exit button responsively
-    if (window.innerWidth <= 767) {
-        exitButton.style("bottom", "20px")
-                 .style("left", "50%")
-                 .style("transform", "translateX(-50%)");
-    }
         
     exitButton.on("click", function() {
         // Hide and remove all text boxes
@@ -253,22 +233,14 @@ function startTutorial() {
         }
         
         // Show a new "Start Tutorial" button
-        const startButton = tutorialContainer.append("button")
+        tutorialContainer.append("button")
             .attr("class", "restart-btn")
             .text("Start Tutorial")
-            .style("opacity", "1");
-        
-        // Position restart button responsively
-        if (window.innerWidth <= 767) {
-            startButton.style("bottom", "20px")
-                      .style("left", "50%")
-                      .style("transform", "translateX(-50%)");
-        }
-        
-        startButton.on("click", function() {
-            d3.select(this).remove(); // Remove this button
-            startTutorial(); // Start the tutorial
-        });
+            .style("opacity", "1")
+            .on("click", function() {
+                d3.select(this).remove(); // Remove this button
+                startTutorial(); // Start the tutorial
+            });
     });
     
     // Show exit button after all boxes are shown
@@ -342,6 +314,7 @@ function startTutorial() {
         }
     }, 500);
 }
+
 // Add CSS for tutorial elements
 const tutorialStyle = document.createElement('style');
 tutorialStyle.innerHTML = `
@@ -375,9 +348,9 @@ tutorialStyle.innerHTML = `
 .restart-btn {
     position: absolute;
     top: 10px;
-    right: 10px;
+    left: 1660px;
     padding: 10px 15px;
-    background-color: rgba(162, 152, 179, 0.9);
+    background-color:rgba(162, 152, 179, 0.9);
     color: white;
     border: none;
     border-radius: 5px;
@@ -408,146 +381,35 @@ tutorialStyle.innerHTML = `
     }
 }
 
-/* Improved mobile styles */
+/* Mobile styles */
 @media screen and (max-width: 767px) {
     .text-box {
-        max-width: 85% !important;
-        font-size: 16px !important;
+        position: static !important;
+        margin: 10px auto !important;
+        width: 90% !important;
+        max-width: 400px !important;
+        transform: none !important;
+        display: block !important;
+        font-size: 14px !important;
         min-height: auto !important;
-        min-width: 200px !important;
-        left: 10px !important;
-        right: auto !important;
-        pointer-events: none !important;
     }
     
-    /* Stack boxes vertically with appropriate spacing */
-    #box-1 { top: 10px !important; }
-    #box-2 { top: 120px !important; }
-    #box-3 { top: 230px !important; }
-    #box-4 { top: 340px !important; }
+    .box-1, .box-2, .box-3, .box-4 {
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+    }
     
     .restart-btn {
-        bottom: 20px !important;
-        top: auto !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        right: auto !important;
-        font-size: 20px !important;
+        bottom: 20px;
+        top: auto;
     }
-}
-
-/* Medium sized screens */
-@media screen and (min-width: 768px) and (max-width: 1199px) {
-    .text-box {
-        min-width: 220px !important;
-        font-size: 18px !important;
-    }
-    
-    /* Adjust positions for medium screens */
-    #box-1 { left: 60% !important; }
-    #box-2 { left: 100% !important; }
-    #box-3 { left: 80% !important; }
-    #box-4 { left: 120% !important; }
 }
 `;
-
 document.head.appendChild(tutorialStyle);
 
-// Add a resize event listener to adjust box positions when the window size changes
-window.addEventListener('resize', function() {
-    const textBoxes = document.querySelectorAll('.text-box');
-    const restartBtn = document.querySelector('.restart-btn');
-    
-    if (window.innerWidth <= 767) {
-        // Mobile view
-        if (textBoxes.length > 0) {
-            textBoxes.forEach((box, index) => {
-                box.style.maxWidth = '85%';
-                box.style.left = '10px';
-                box.style.right = 'auto';
-                
-                // Stack boxes vertically
-                switch(index) {
-                    case 0: box.style.top = '10px'; break;
-                    case 1: box.style.top = '120px'; break;
-                    case 2: box.style.top = '230px'; break;
-                    case 3: box.style.top = '340px'; break;
-                }
-                
-                // Clear any bottom positioning
-                box.style.bottom = 'auto';
-            });
-        }
-        
-        // Reposition restart button
-        if (restartBtn) {
-            restartBtn.style.bottom = '20px';
-            restartBtn.style.top = 'auto';
-            restartBtn.style.left = '50%';
-            restartBtn.style.transform = 'translateX(-50%)';
-            restartBtn.style.right = 'auto';
-        }
-    } else if (window.innerWidth <= 1199) {
-        // Medium screen adjustments
-        if (textBoxes.length > 0) {
-            const positions = [
-                { left: '60%', top: '12%', bottom: 'auto' },
-                { left: '100%', top: '10%', bottom: 'auto' },
-                { left: '80%', top: 'auto', bottom: '20%' },
-                { left: '120%', top: 'auto', bottom: '55%' }
-            ];
-            
-            textBoxes.forEach((box, index) => {
-                if (positions[index]) {
-                    Object.entries(positions[index]).forEach(([key, value]) => {
-                        box.style[key] = value;
-                    });
-                }
-            });
-        }
-        
-        // Reposition restart button
-        if (restartBtn) {
-            restartBtn.style.top = '10px';
-            restartBtn.style.right = '10px';
-            restartBtn.style.bottom = 'auto';
-            restartBtn.style.left = 'auto';
-            restartBtn.style.transform = 'none';
-        }
-    } else {
-        // Large screen - use original positions
-        if (textBoxes.length > 0) {
-            const originalPositions = [
-                { top: '12%', left: '80%', bottom: 'auto' },
-                { top: '10%', left: '260%', bottom: 'auto' },
-                { bottom: '20%', left: '100%', top: 'auto' },
-                { bottom: '55%', left: '335%', top: 'auto' }
-            ];
-            
-            textBoxes.forEach((box, index) => {
-                if (originalPositions[index]) {
-                    Object.entries(originalPositions[index]).forEach(([key, value]) => {
-                        box.style[key] = value;
-                    });
-                }
-            });
-        }
-        
-        // Reposition restart button to original position
-        if (restartBtn) {
-            restartBtn.style.top = '10px';
-            restartBtn.style.right = '10px';
-            restartBtn.style.left = 'auto';
-            restartBtn.style.bottom = 'auto';
-            restartBtn.style.transform = 'none';
-        }
-    }
-});
-
-
-/************************************/
-// 2. Add CSS for tapir selector
-/************************************/
 
 // Create tapir structure
 const tapirGroup = selectorSvg.append("g").attr("transform", "scale(0.8) translate(50, 50)");
