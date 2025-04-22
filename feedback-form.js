@@ -40,6 +40,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submit-button');
     const thankYouMessage = document.getElementById('thank-you');
     
+    // Track form submission
+    let formSubmitted = false;
+    
+    // Store submission status in sessionStorage to persist across script re-execution
+    if (sessionStorage.getItem('formSubmitted') === 'true') {
+        formSubmitted = true;
+        
+        // If form was already submitted, show thank you and hide inputs
+        thankYouMessage.style.display = 'block';
+        ageContainer.style.display = 'none';
+        locationContainer.style.display = 'none';
+        feedbackContainer.style.display = 'none';
+        submitContainer.style.display = 'none';
+        
+        // Also disable the buttons
+        ageButton.disabled = true;
+        locationButton.disabled = true;
+        feedbackButton.disabled = true;
+        ageButton.style.opacity = '0.5';
+        locationButton.style.opacity = '0.5';
+        feedbackButton.style.opacity = '0.5';
+    }
+    
     // Populate the country dropdown
     countries.forEach(country => {
         const option = document.createElement('option');
@@ -62,8 +85,27 @@ document.addEventListener('DOMContentLoaded', function() {
         feedback: false
     };
     
+    // Move the submit container to be next to feedback buttons
+    // This is important for the new positioning
+    const feedbackButtons = document.querySelector('.feedback-buttons');
+    if (feedbackButtons && submitContainer) {
+        // Check if submit container is not already a child of feedback buttons
+        if (submitContainer.parentNode !== feedbackButtons) {
+            // First, save a reference to the original parent
+            const originalParent = submitContainer.parentNode;
+            
+            // Move the submit container into the feedback buttons container
+            feedbackButtons.appendChild(submitContainer);
+            
+            console.log('Submit container moved to feedback buttons section');
+        }
+    }
+    
     // Toggle sections when buttons are clicked
     ageButton.addEventListener('click', function() {
+        // Skip if form already submitted
+        if (formSubmitted) return;
+        
         // If this container is already visible, hide it
         if (ageContainer.style.display === 'block') {
             ageContainer.style.display = 'none';
@@ -81,6 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     locationButton.addEventListener('click', function() {
+        // Skip if form already submitted
+        if (formSubmitted) return;
+        
         // If this container is already visible, hide it
         if (locationContainer.style.display === 'block') {
             locationContainer.style.display = 'none';
@@ -98,6 +143,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     feedbackButton.addEventListener('click', function() {
+        // Skip if form already submitted
+        if (formSubmitted) return;
+        
         // If this container is already visible, hide it
         if (feedbackContainer.style.display === 'block') {
             feedbackContainer.style.display = 'none';
@@ -116,17 +164,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update form data when inputs change
     ageInput.addEventListener('input', function() {
+        // Skip if form already submitted
+        if (formSubmitted) return;
+        
         formData.age = this.value;
         updateSubmitButtonVisibility();
     });
     
     locationSelect.addEventListener('change', function() {
+        // Skip if form already submitted
+        if (formSubmitted) return;
+        
         formData.location = this.value;
         updateSubmitButtonVisibility();
     });
     
     feedbackRadios.forEach(radio => {
         radio.addEventListener('change', function() {
+            // Skip if form already submitted
+            if (formSubmitted) return;
+            
             formData.feedback = this.value;
             updateSubmitButtonVisibility();
         });
@@ -134,6 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show submit button only if all three questions are answered
     function updateSubmitButtonVisibility() {
+        // If form already submitted, always hide submit button
+        if (formSubmitted) {
+            submitContainer.style.display = 'none';
+            return;
+        }
+        
         // Check if all three form fields have values
         const allQuestionsAnswered = formData.age !== '' && 
                                      formData.location !== '' && 
@@ -141,11 +204,63 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Only show submit if all questions are answered
         submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
+        
+        // Update media query positioning
+        updateSubmitButtonPosition();
     }
     
+    // Function to handle responsive positioning of the submit button
+    function updateSubmitButtonPosition() {
+        // Check if we need to adjust for mobile view
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            submitContainer.style.position = 'relative';
+            submitContainer.style.left = 'auto';
+            submitContainer.style.top = 'auto';
+            submitContainer.style.transform = 'none';
+            submitContainer.style.marginTop = '20px';
+        } else {
+            submitContainer.style.position = 'absolute';
+            submitContainer.style.left = '-90px';
+            submitContainer.style.top = '50%';
+            submitContainer.style.transform = 'translateY(-50%)';
+            submitContainer.style.margin = '0';
+        }
+    }
+    
+    // Call this on window resize too
+    window.addEventListener('resize', updateSubmitButtonPosition);
+    
     // Handle form submission
-    submitButton.addEventListener('click', function() {
-        // Use the new form submission function
+    submitButton.addEventListener('click', function(e) {
+        // Prevent any default behavior
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Don't allow resubmission
+        if (formSubmitted) {
+            console.log("Form already submitted, ignoring click");
+            return;
+        }
+        
+        console.log("Submit button clicked");
+        
+        // Mark form as submitted
+        formSubmitted = true;
+        
+        // Store submission status in sessionStorage
+        sessionStorage.setItem('formSubmitted', 'true');
+        
+        // Disable the buttons
+        ageButton.disabled = true;
+        locationButton.disabled = true;
+        feedbackButton.disabled = true;
+        ageButton.style.opacity = '0.5';
+        locationButton.style.opacity = '0.5';
+        feedbackButton.style.opacity = '0.5';
+        
+        // Use the form submission function
         sendToGoogleForm(formData);
         
         // Show thank you message
@@ -178,6 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('entry.168865574', data.age);         // Age field
         formData.append('entry.2085059612', data.location);   // Location field
         formData.append('entry.2116187728', data.feedback);   // Feedback field
+        
+        // Log the data being submitted
+        console.log('Submitting form data:', data);
         
         // Create an invisible iframe to submit the form (avoids CORS issues)
         const iframe = document.createElement('iframe');
@@ -216,9 +334,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize - hide all inputs
-    ageContainer.style.display = 'none';
-    locationContainer.style.display = 'none';
-    feedbackContainer.style.display = 'none';
-    submitContainer.style.display = 'none';
-    thankYouMessage.style.display = 'none';
+    if (!formSubmitted) {
+        ageContainer.style.display = 'none';
+        locationContainer.style.display = 'none';
+        feedbackContainer.style.display = 'none';
+        submitContainer.style.display = 'none';
+        thankYouMessage.style.display = 'none';
+    }
+    
+    // Initialize the button position based on screen size
+    updateSubmitButtonPosition();
 });

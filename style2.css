@@ -987,6 +987,7 @@
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
+  position: relative; /* For absolute positioning of submit button */
 }
 
 .feedback-button {
@@ -996,6 +997,7 @@
   border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
+  margin-bottom: 10px;
   cursor: pointer;
   font-size: 18px;
   box-shadow: 3px 3px 0px #696363;
@@ -1012,9 +1014,11 @@
   box-shadow: 2px 2px 0px #696363;
 }
 
+/* Ensure proper container spacing */
 .feedback-input-container {
-  display: none;
-  margin: 15px 0;
+  position: relative;
+  z-index: 95;
+  margin-bottom: 1px;
 }
 
 .feedback-label {
@@ -1057,6 +1061,7 @@
   font-size: 20px;
 }
 
+/* Submit button styling */
 #submit-button {
   font-family: 'Caveat Brush', cursive;
   color: #2d2b2b;
@@ -1064,28 +1069,38 @@
   border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
-  cursor: pointer;
+  cursor: pointer !important;
   font-size: 18px;
   box-shadow: 3px 3px 0px #696363;
   transition: transform 0.2s, box-shadow 0.2s;
+  animation: pulse 1.5s infinite;
+  pointer-events: auto !important;
 }
 
+
 #submit-button:hover {
+  animation: none;
   transform: translateY(-2px);
   box-shadow: 3px 5px 0px #696363;
 }
 
 #submit-button:active {
+  animation: none;
   transform: translateY(1px);
   box-shadow: 2px 2px 0px #696363;
 }
 
+/* Submit button positioning on the RIGHT side */
 #submit-container {
-  display: none;
-  margin: 15px 0;
-  text-align: center;
+  position: absolute;
+  right: -100%; /* Position to the right of the form */
+  top: 40%; /* Position vertically */
+  transform: translateY(-50%);
+  display: none; /* Initially hidden */
+  z-index: 100;
 }
 
+/* Make sure thank you message is visible */
 #thank-you {
   display: none;
   font-family: 'Caveat Brush', cursive;
@@ -1093,11 +1108,56 @@
   color: #fffaf0;
   margin: 15px 0;
   text-align: center;
+  position: relative;
+  z-index: 100;
+}
+
+/* Pulsing animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 3px 3px 0px #696363;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 5px 5px 0px #696363;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 3px 3px 0px #696363;
+  }
 }
 
 /* ==============================================
     16. LOLLIPOP
-=============================================== 
+=============================================== */
+
+/* Fix for any potential overflow issues */
+#lollipop-chart-container {
+  overflow: visible;
+  position: relative;
+  margin-bottom: 30px; /* Add space below the chart */
+}
+
+/* General fixes for clickable elements */
+button, 
+select, 
+input[type="radio"],
+input[type="text"],
+input[type="number"] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+
+/* Ensure form sections don't get hidden behind SVG elements */
+#age-container,
+#location-container,
+#feedback-container {
+  position: relative;
+  z-index: 90;
+}
+
 
 /* Chart elements */
 .lollipop-circle {
@@ -1220,4 +1280,33 @@
   color: 
 #fffaf0;
   font-style: italic;
+}
+
+/* Add visible focus styles to improve accessibility */
+#submit-button:focus {
+  outline: 3px solid #FF6B6B;
+  outline-offset: 2px;
+}
+
+/* Ensure the feedback buttons stay clickable */
+.feedback-button {
+  position: relative;
+  z-index: 92;
+}
+
+/* Media query for smaller screens - adjust position */
+@media (max-width: 768px) {
+  #submit-container {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  /* Make sure submit button is centered on small screens */
+  #submit-button {
+    margin: 0 auto;
+  }
 }
