@@ -62,45 +62,61 @@ document.addEventListener('DOMContentLoaded', function() {
         feedback: false
     };
     
-    // Improved button click handlers with better event delegation
-    function handleButtonClick(button, container, sectionName) {
-        return function(e) {
-            e.preventDefault(); // Prevent default behavior
-            e.stopPropagation(); // Stop event bubbling
-            
-            // Get computed style to check visibility reliably
-            const computedStyle = window.getComputedStyle(container);
-            const isVisible = computedStyle.display !== 'none';
-            
-            // Toggle visibility with reliable checks
-            if (isVisible) {
-                container.style.display = 'none';
-                sectionsVisible[sectionName] = false;
-                button.style.backgroundColor = '';
-            } else {
-                container.style.display = 'block';
-                sectionsVisible[sectionName] = true;
-                button.style.backgroundColor = '#2a9d8f';
-            }
-            
-            // Update submit button visibility
-            updateSubmitButtonVisibility();
-        };
-    }
+    // Toggle sections when buttons are clicked
+    ageButton.addEventListener('click', function() {
+        // If this container is already visible, hide it
+        if (ageContainer.style.display === 'block') {
+            ageContainer.style.display = 'none';
+            sectionsVisible.age = false;
+            // Remove the selected color
+            this.style.backgroundColor = '';
+        } else {
+            // Show only this container
+            ageContainer.style.display = 'block';
+            sectionsVisible.age = true;
+            // Set the selected button color
+            this.style.backgroundColor = '#2a9d8f';
+        }
+        updateSubmitButtonVisibility();
+    });
     
-    // Use improved event handlers with proper binding
-    ageButton.addEventListener('click', handleButtonClick(ageButton, ageContainer, 'age'));
-    locationButton.addEventListener('click', handleButtonClick(locationButton, locationContainer, 'location'));
-    feedbackButton.addEventListener('click', handleButtonClick(feedbackButton, feedbackContainer, 'feedback'));
+    locationButton.addEventListener('click', function() {
+        // If this container is already visible, hide it
+        if (locationContainer.style.display === 'block') {
+            locationContainer.style.display = 'none';
+            sectionsVisible.location = false;
+            // Remove the selected color
+            this.style.backgroundColor = '';
+        } else {
+            // Show only this container
+            locationContainer.style.display = 'block';
+            sectionsVisible.location = true;
+            // Set the selected button color
+            this.style.backgroundColor = '#2a9d8f';
+        }
+        updateSubmitButtonVisibility();
+    });
     
-    // Add touchstart event listeners for mobile devices
-    ageButton.addEventListener('touchstart', handleButtonClick(ageButton, ageContainer, 'age'));
-    locationButton.addEventListener('touchstart', handleButtonClick(locationButton, locationContainer, 'location'));
-    feedbackButton.addEventListener('touchstart', handleButtonClick(feedbackButton, feedbackContainer, 'feedback'));
+    feedbackButton.addEventListener('click', function() {
+        // If this container is already visible, hide it
+        if (feedbackContainer.style.display === 'block') {
+            feedbackContainer.style.display = 'none';
+            sectionsVisible.feedback = false;
+            // Remove the selected color
+            this.style.backgroundColor = '';
+        } else {
+            // Show only this container
+            feedbackContainer.style.display = 'block';
+            sectionsVisible.feedback = true;
+            // Set the selected button color
+            this.style.backgroundColor = '#2a9d8f';
+        }
+        updateSubmitButtonVisibility();
+    });
     
-    // Update form data when inputs change with proper validation
+    // Update form data when inputs change
     ageInput.addEventListener('input', function() {
-        formData.age = this.value.trim();
+        formData.age = this.value;
         updateSubmitButtonVisibility();
     });
     
@@ -109,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSubmitButtonVisibility();
     });
     
-    // Improved radio button handling
     feedbackRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             formData.feedback = this.value;
@@ -117,136 +132,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Show submit button only if ALL three questions are answered
+    // Show submit button only if all three questions are answered
     function updateSubmitButtonVisibility() {
-        // Only show submit button if all three form fields have values
-        const allQuestionsAnswered = formData.age.trim() !== '' && 
+        // Check if all three form fields have values
+        const allQuestionsAnswered = formData.age !== '' && 
                                      formData.location !== '' && 
                                      formData.feedback !== '';
         
-        // The submit button is only shown when all questions are answered
+        // Only show submit if all questions are answered
         submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
-        
-        // Log validation status for debugging
-        console.log('Form validation status:', {
-            ageValid: formData.age.trim() !== '',
-            locationValid: formData.location !== '', 
-            feedbackValid: formData.feedback !== '',
-            allQuestionsAnswered,
-            showSubmit: allQuestionsAnswered
-        });
     }
     
-    // Function to send data to Google Form
-    function sendToGoogleForm(data) {
-        // Only send data for visible sections
-        const dataToSend = {};
+    // Handle form submission
+    submitButton.addEventListener('click', function() {
+        // Use the new form submission function
+        sendToGoogleForm(formData);
         
-        if (sectionsVisible.age) {
-            dataToSend.age = data.age;
-        }
-        
-        if (sectionsVisible.location) {
-            dataToSend.location = data.location;
-        }
-        
-        if (sectionsVisible.feedback) {
-            dataToSend.feedback = data.feedback;
-        }
-        
-        // Form submission URL
-        const formUrl = "https://docs.google.com/forms/d/10hTG8qn5GtfG18Tg_b7isYTZ1spRt21vNSyqSt1rbwk/formResponse";
-        
-        // Create a FormData object with the correct entry IDs
-        const formData = new FormData();
-        
-        // Only append fields that have values
-        if (dataToSend.age) {
-            formData.append('entry.168865574', dataToSend.age);
-        }
-        
-        if (dataToSend.location) {
-            formData.append('entry.2085059612', dataToSend.location);
-        }
-        
-        if (dataToSend.feedback) {
-            formData.append('entry.2116187728', dataToSend.feedback);
-        }
-        
-        // Create an invisible iframe to submit the form (avoids CORS issues)
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
-        // Set up form in iframe with error handling
-        iframe.onload = function() {
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                const form = iframeDoc.createElement('form');
-                form.method = 'POST';
-                form.action = formUrl;
-                
-                // Add form data
-                for (const [key, value] of formData.entries()) {
-                    const input = iframeDoc.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                }
-                
-                // Add form to iframe and submit
-                iframeDoc.body.appendChild(form);
-                form.submit();
-                console.log('Form submitted!', dataToSend);
-                
-                // Clean up after submission
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                }, 1000);
-            } catch (error) {
-                console.error('Form submission error:', error);
-                // Still show thank you message even if there's an error
-                showThankYouMessage();
-            }
-        };
-        
-        // Handle iframe loading errors
-        iframe.onerror = function() {
-            console.error('Form iframe loading error');
-            // Still show thank you message even if there's an error
-            showThankYouMessage();
-        };
-        
-        // Set src to about:blank to trigger onload
-        iframe.src = 'about:blank';
-    }
-    
-    // Function to handle form submission with chart update
-    function handleFormSubmission(data) {
-        // Send data to Google Form
-        sendToGoogleForm(data);
-        
-        // Wait a moment for the data to propagate to the spreadsheet
-        // then check if the chart refresh function exists and call it
-        setTimeout(() => {
-            if (document.getElementById('lollipop-chart-container') && 
-                typeof window.generateAgeLollipopChart === 'function') {
-                try {
-                    window.generateAgeLollipopChart('lollipop-chart-container');
-                    console.log('Chart update triggered after form submission');
-                } catch (error) {
-                    console.error('Chart update error:', error);
-                }
-            }
-        }, 1500); // 1.5 seconds delay to allow time for Google Form submission to update the sheet
-        
-        // Show thank you message
-        showThankYouMessage();
-    }
-    
-    // Function to show thank you message and reset form
-    function showThankYouMessage() {
         // Show thank you message
         thankYouMessage.style.display = 'block';
         submitContainer.style.display = 'none';
@@ -265,44 +166,59 @@ document.addEventListener('DOMContentLoaded', function() {
         ageButton.style.backgroundColor = '';
         locationButton.style.backgroundColor = '';
         feedbackButton.style.backgroundColor = '';
-    }
-
-    // Handle form submission with debounce to prevent double-clicks
-    let isSubmitting = false;
-    submitButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Prevent multiple submissions
-        if (isSubmitting) return;
-        
-        isSubmitting = true;
-        
-        // Use the form submission handler
-        handleFormSubmission(formData);
-        
-        // Reset submission state after a delay
-        setTimeout(() => {
-            isSubmitting = false;
-        }, 2000);
     });
     
-    // Add touchstart event for mobile devices
-    submitButton.addEventListener('touchstart', function(e) {
-        if (!isSubmitting) {
-            e.preventDefault();
-            submitButton.click();
-        }
-    });
+    // Function to send data to Google Form
+    function sendToGoogleForm(data) {
+        // Form submission URL
+        const formUrl = "https://docs.google.com/forms/d/10hTG8qn5GtfG18Tg_b7isYTZ1spRt21vNSyqSt1rbwk/formResponse";
+        
+        // Create a FormData object with the correct entry IDs
+        const formData = new FormData();
+        formData.append('entry.168865574', data.age);         // Age field
+        formData.append('entry.2085059612', data.location);   // Location field
+        formData.append('entry.2116187728', data.feedback);   // Feedback field
+        
+        // Create an invisible iframe to submit the form (avoids CORS issues)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        // Set up form in iframe
+        iframe.onload = function() {
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const form = iframeDoc.createElement('form');
+            form.method = 'POST';
+            form.action = formUrl;
+            
+            // Add form data
+            for (const [key, value] of formData.entries()) {
+                const input = iframeDoc.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            // Add form to iframe and submit
+            iframeDoc.body.appendChild(form);
+            form.submit();
+            console.log('Form submitted!', data);
+            
+            // Clean up after submission
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };
+        
+        // Set src to about:blank to trigger onload
+        iframe.src = 'about:blank';
+    }
 
-    // Initialize - hide all inputs and ensure proper state
+    // Initialize - hide all inputs
     ageContainer.style.display = 'none';
     locationContainer.style.display = 'none';
     feedbackContainer.style.display = 'none';
     submitContainer.style.display = 'none';
     thankYouMessage.style.display = 'none';
-    
-    // Reset any lingering button colors on page load
-    ageButton.style.backgroundColor = '';
-    locationButton.style.backgroundColor = '';
-    feedbackButton.style.backgroundColor = '';
 });

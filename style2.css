@@ -16,7 +16,6 @@
    13. TAPIR HEAD STYLES
    14. TAPIR PICTURES MOSAIC
    15. TAPIR QUESTIONNAIRE
-   16. LOLLIPOP
    ================================================ */
 
 /* ==============================================
@@ -30,7 +29,15 @@
   /* ==============================================
      2. TYPOGRAPHY & TEXT EFFECTS
      ============================================== */
- 
+  h1 {
+    text-align: center;
+    font-family: "Berkshire Swash", serif;
+    font-weight: 400;
+    font-style: normal;
+    color: #657470;
+    font-size: 32px;
+  }
+      
   /* CSS-only highlight style */
   .highlight-brush {
     position: relative;
@@ -972,6 +979,7 @@
     15. TAPIR QUESTIONNAIRE  
 =============================================== */
 
+
 /* Feedback Form Styles */
 .feedback-buttons {
   display: flex;
@@ -983,31 +991,25 @@
 
 .feedback-button {
   font-family: 'Caveat Brush', cursive;
-  background-color: 
-#fffaf0;
-  color: 
-#2d2b2b;
-  border: 2px solid 
-#696363;
+  background-color: #fffaf0;
+  color: #2d2b2b;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 18px;
-  box-shadow: 3px 3px 0px 
-#696363;
+  box-shadow: 3px 3px 0px #696363;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .feedback-button:hover {
   transform: translateY(-2px);
-  box-shadow: 3px 5px 0px 
-#696363;
+  box-shadow: 3px 5px 0px #696363;
 }
 
 .feedback-button:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px 
-#696363;
+  box-shadow: 2px 2px 0px #696363;
 }
 
 .feedback-input-container {
@@ -1022,17 +1024,14 @@
 
 .feedback-input {
   font-family: 'Caveat Brush', cursive;
-  color: 
-#2d2b2b;
-  border: 2px solid 
-#696363;
+  color: #2d2b2b;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px;
   margin: 10px 0;
   font-size: 18px;
   width: 100%;
-  background: 
-#fffaf0;
+  background: #fffaf0;
 }
 
 .feedback-radio-group {
@@ -1060,31 +1059,25 @@
 
 #submit-button {
   font-family: 'Caveat Brush', cursive;
-  color: 
-#2d2b2b;
-  background: 
-#9ee5d4;
-  border: 2px solid 
-#696363;
+  color: #2d2b2b;
+  background: #9ee5d4;
+  border: 2px solid #696363;
   border-radius: 6px;
   padding: 8px 16px;
   cursor: pointer;
   font-size: 18px;
-  box-shadow: 3px 3px 0px 
-#696363;
+  box-shadow: 3px 3px 0px #696363;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 #submit-button:hover {
   transform: translateY(-2px);
-  box-shadow: 3px 5px 0px 
-#696363;
+  box-shadow: 3px 5px 0px #696363;
 }
 
 #submit-button:active {
   transform: translateY(1px);
-  box-shadow: 2px 2px 0px 
-#696363;
+  box-shadow: 2px 2px 0px #696363;
 }
 
 #submit-container {
@@ -1097,148 +1090,7 @@
   display: none;
   font-family: 'Caveat Brush', cursive;
   font-size: 30px;
-  color: 
-#fffaf0;
+  color: #fffaf0;
   margin: 15px 0;
   text-align: center;
-}
-
-/* Mobile optimization */
-@media (max-width: 768px) {
-  .feedback-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .feedback-button {
-    width: 80%;
-    margin-bottom: 10px;
-    padding: 12px 16px; /* Larger touch targets for mobile */
-  }
-  
-  .feedback-radio-group {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-
-/* ==============================================
-    16. LOLLIPOP
-=============================================== */
-
-/* Chart elements */
-.lollipop-circle {
-  fill: #FF6B6B;
-  stroke: #A6D6D6;
-  stroke-width: 1;
-  cursor: pointer;
-  transition: fill 0.2s ease;
-}
-
-.lollipop-circle:hover {
-  fill: #A6D6D6;
-}
-
-.lollipop-stick {
-  stroke: #A6D6D6;
-  stroke-width: 2;
-}
-
-/* Count display elements */
-.count-text {
-  font-size: 20px;
-  font-weight: bold;
-  fill: #fffaf0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.count-background {
-  fill: #ff6b6bc3;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-  fill-opacity: 0.5;
-}
-
-/* Tooltip */
-.tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  color: #333;
-  padding: 2px;
-  border-radius: 4px;
-  z-index: 100;
-  pointer-events: none;
-}
-
-/* Axis elements */
-.axis-line {
-  stroke: #333;
-  stroke-width: 1;
-}
-
-.axis-tick {
-  stroke: #333;
-  stroke-width: 1;
-}
-
-.axis-label {
-  font-size: 14px;
-  text-anchor: middle;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #f0e8e8c8;
-}
-
-.x-axis-title {
-  font-size: 14px;
-  text-anchor: middle;
-  font-weight: bold;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #333;
-}
-
-/* Labels 
-.chart-title {
-  font-size: 22px;
-  text-anchor: middle;
-  font-weight: bold;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #333;
-}*/
-
-.country-label {
-  font-size: 16px;
-  text-anchor: end;
-  font-family: 'Bungee', Arial, sans-serif;
-  fill: #333
-}
-
-.range-label {
-  font-size: 14px;
-  fill: #fffaf0;
-}
-
-/* Other elements */
-.no-data-text {
-  text-anchor: middle;
-  font-size: 16px;
-  fill: #333;
-  font-family: 'Bungee', Arial, sans-serif;
-}
-
-/* Chart update indicator styles */
-/* #chart-update-indicator {
-  font-size: 14px;
-  color: #f0e8e8c8;
-  text-align: center;
-  margin-top: -30%;
-  position: relative; 
-} */
-
-.loading-indicator {
-  text-align: center;
-  padding: 20px;
-  color: #fffaf0;
-  font-style: italic;
 }
