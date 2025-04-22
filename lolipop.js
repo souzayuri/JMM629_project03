@@ -177,6 +177,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return chartData.sort((a, b) => b.avgAge - a.avgAge);
     }
     
+    // NEW: Function to estimate text width
+    function estimateTextWidth(text, fontSize) {
+        // This is a rough estimate - character width varies by font and character
+        const avgCharWidth = fontSize * 0.6; // Average character width as a factor of font size
+        return text.length * avgCharWidth;
+    }
+    
     // Create the lollipop chart SVG
     function createLollipopChart(chartData, containerWidth) {
         // Check if there's data to display
@@ -204,13 +211,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const width = containerWidth || 800; // Default to 800 if containerWidth is not provided
         const height = Math.min(600, Math.max(400, width * 0.75)); // Responsive height based on width
         
-        // Adjust margins based on screen size
+        // NEW: Calculate left margin based on longest country name
+        const baseFontSize = width < 500 ? 12 : 14;
+        const longestCountryName = chartData.reduce((longest, d) => 
+            d.country.length > longest.length ? d.country : longest, "");
+        console.log("Longest country name:", longestCountryName, "Length:", longestCountryName.length);
+        
+        // Estimate text width of longest country name
+        const estimatedLabelWidth = estimateTextWidth(longestCountryName, baseFontSize);
+        console.log("Estimated label width:", estimatedLabelWidth);
+        
+        // Adjust margins based on screen size and longest country name
         const margin = { 
             top: Math.max(20, width * 0.05), 
             right: Math.max(60, width * 0.15), 
-            bottom: Math.max(40, width * 0.075), 
-            left: Math.max(100, width * 0.175)
+            // Dynamically calculate left margin with padding and minimum size
+            left: Math.max(100, estimatedLabelWidth + 20), 
+            bottom: Math.max(40, width * 0.075) 
         };
+        
+        console.log("Calculated left margin:", margin.left);
         
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
@@ -485,15 +505,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-            // Add a small indicator to show when the chart was last updated
-               // const updateIndicator = document.createElement('div');
-               // updateIndicator.id = 'chart-update-indicator';
-               // updateIndicator.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-            
-              //  container.appendChild(updateIndicator);
-            
-               // console.log("Chart generation complete");
-               // return true; // Indicate successful chart generation
+            console.log("Chart generation complete");
+            return true; // Indicate successful chart generation
             
         } catch (error) {
             console.error('Error generating chart:', error);
@@ -502,4 +515,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-
