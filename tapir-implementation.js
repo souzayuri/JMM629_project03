@@ -25,12 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
       "8": { containerId: "tapir-head-section-8", position: 0 },
       "9": { containerId: "tapir-head-section-9", position: 0 },
       "10": { containerId: "tapir-head-section-10", position: 0 },
-      "11": { containerId: "tapir-head-section-10", position: 0 },
-      "12": { containerId: "tapir-head-section-10", position: 0 },
-      "13": { containerId: "tapir-head-section-10", position: 0 },
-      "14": { containerId: "tapir-head-section-10", position: 0 },
-      "15": { containerId: "tapir-head-section-10", position: 0 },
-      "16": { containerId: "tapir-head-section-16", position: 0 }
+      "11": { containerId: "tapir-head-section-11", position: 0 },
+      "12": { containerId: "tapir-head-section-12", position: 0 },
+      "13": { containerId: "tapir-head-section-13", position: 0 },
+      "14": { containerId: "tapir-head-section-14", position: 0 },
+      "15": { containerId: "tapir-head-section-15", position: 0 },
+      "16": { containerId: "tapir-head-section-16", position: 0 },
+      "17": { containerId: "tapir-head-section-17", position: 0 }
     };
     
     // Create tapir containers in the specified sections

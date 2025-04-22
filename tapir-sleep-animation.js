@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initSleepingTapirAnimation() {
       // Reference to the container
-      const container = document.querySelector('.step[data-index="17"] .content');
+      const container = document.querySelector('.step[data-index="18"] .content');
       if (!container) {
         console.error('Container for step 17 not found');
         return;

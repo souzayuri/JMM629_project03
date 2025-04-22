@@ -1,244 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // All countries list
-    const countries = [
-        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Barbuda", "Argentina", "Armenia", "Australia", "Austria", 
-        "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", 
-        "Bolivia", "Bosnia & Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", 
-        "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", 
-        "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", 
-        "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", 
-        "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", 
-        "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", 
-        "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", 
-        "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", 
-        "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", 
-        "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", 
-        "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", 
-        "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", 
-        "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines", "Samoa", "San Marino", "São Tomé & Príncipe", 
-        "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", 
-        "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", 
-        "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", 
-        "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", 
-        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-    ];
-    
-    // ================ FORM SUBMISSION SECTION ================
-    
-    // Element references
-    const ageButton = document.getElementById('age-button');
-    const locationButton = document.getElementById('location-button');
-    const feedbackButton = document.getElementById('feedback-button');
-    
-    const ageContainer = document.getElementById('age-container');
-    const locationContainer = document.getElementById('location-container');
-    const feedbackContainer = document.getElementById('feedback-container');
-    
-    const ageInput = document.getElementById('age-input');
-    const locationSelect = document.getElementById('location-select');
-    const feedbackRadios = document.querySelectorAll('input[name="feedback"]');
-    
-    const submitContainer = document.getElementById('submit-container');
-    const submitButton = document.getElementById('submit-button');
-    const thankYouMessage = document.getElementById('thank-you');
-    
-    // Populate the country dropdown
-    countries.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country;
-        option.textContent = country;
-        locationSelect.appendChild(option);
-    });
-    
-    // Form data 
-    let formData = {
-        age: '',
-        location: '',
-        feedback: ''
-    };
-    
-    // Track which sections are completed and visible
-    let sectionsVisible = {
-        age: false,
-        location: false,
-        feedback: false
-    };
-    
-    // Toggle sections when buttons are clicked
-    ageButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (ageContainer.style.display === 'block') {
-            ageContainer.style.display = 'none';
-            sectionsVisible.age = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            ageContainer.style.display = 'block';
-            sectionsVisible.age = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
-    });
-    
-    locationButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (locationContainer.style.display === 'block') {
-            locationContainer.style.display = 'none';
-            sectionsVisible.location = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            locationContainer.style.display = 'block';
-            sectionsVisible.location = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
-    });
-    
-    feedbackButton.addEventListener('click', function() {
-        // If this container is already visible, hide it
-        if (feedbackContainer.style.display === 'block') {
-            feedbackContainer.style.display = 'none';
-            sectionsVisible.feedback = false;
-            // Remove the selected color
-            this.style.backgroundColor = '';
-        } else {
-            // Show only this container
-            feedbackContainer.style.display = 'block';
-            sectionsVisible.feedback = true;
-            // Set the selected button color
-            this.style.backgroundColor = '#2a9d8f';
-        }
-        updateSubmitButtonVisibility();
-    });
-    
-    // Update form data when inputs change
-    ageInput.addEventListener('input', function() {
-        formData.age = this.value;
-        updateSubmitButtonVisibility();
-    });
-    
-    locationSelect.addEventListener('change', function() {
-        formData.location = this.value;
-        updateSubmitButtonVisibility();
-    });
-    
-    feedbackRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            formData.feedback = this.value;
-            updateSubmitButtonVisibility();
-        });
-    });
-    
-    // Show submit button only if all three questions are answered
-    function updateSubmitButtonVisibility() {
-        // Check if all three form fields have values
-        const allQuestionsAnswered = formData.age !== '' && 
-                                     formData.location !== '' && 
-                                     formData.feedback !== '';
-        
-        // Only show submit if all questions are answered
-        submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
-    }
-    
-    // Handle form submission
-    submitButton.addEventListener('click', function() {
-        // Use the new form submission function
-        sendToGoogleForm(formData);
-        
-        // Show thank you message
-        thankYouMessage.style.display = 'block';
-        submitContainer.style.display = 'none';
-        
-        // Hide all input containers
-        ageContainer.style.display = 'none';
-        locationContainer.style.display = 'none';
-        feedbackContainer.style.display = 'none';
-        
-        // Reset sections visible state
-        sectionsVisible.age = false;
-        sectionsVisible.location = false;
-        sectionsVisible.feedback = false;
-        
-        // Reset button colors
-        ageButton.style.backgroundColor = '';
-        locationButton.style.backgroundColor = '';
-        feedbackButton.style.backgroundColor = '';
-    });
-    
-    // Function to send data to Google Form
-    function sendToGoogleForm(data) {
-        // Form submission URL
-        const formUrl = "https://docs.google.com/forms/d/10hTG8qn5GtfG18Tg_b7isYTZ1spRt21vNSyqSt1rbwk/formResponse";
-        
-        // Create a FormData object with the correct entry IDs
-        const formData = new FormData();
-        formData.append('entry.168865574', data.age);         // Age field
-        formData.append('entry.2085059612', data.location);   // Location field
-        formData.append('entry.2116187728', data.feedback);   // Feedback field
-        
-        // Create an invisible iframe to submit the form (avoids CORS issues)
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
-        // Set up form in iframe
-        iframe.onload = function() {
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const form = iframeDoc.createElement('form');
-            form.method = 'POST';
-            form.action = formUrl;
-            
-            // Add form data
-            for (const [key, value] of formData.entries()) {
-                const input = iframeDoc.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-            
-            // Add form to iframe and submit
-            iframeDoc.body.appendChild(form);
-            form.submit();
-            console.log('Form submitted!', data);
-            
-            // Clean up after submission
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
-        };
-        
-        // Set src to about:blank to trigger onload
-        iframe.src = 'about:blank';
-    }
-
-    // Initialize - hide all inputs
-    ageContainer.style.display = 'none';
-    locationContainer.style.display = 'none';
-    feedbackContainer.style.display = 'none';
-    submitContainer.style.display = 'none';
-    thankYouMessage.style.display = 'none';
-    
-    // ================ DATA VISUALIZATION SECTION ================
-    
     // If there's a chart container on the page, initialize the visualization
     const chartContainer = document.getElementById('lollipop-chart-container');
     if (chartContainer) {
+        // Generate chart immediately on page load
         generateAgeLollipopChart('lollipop-chart-container');
     }
 
+    // Make the function globally available
+    window.generateAgeLollipopChart = generateAgeLollipopChart;
+    
     // Function to fetch data from the published Google Spreadsheet
     async function fetchSpreadsheetData() {
+        // Add cache-busting parameter to prevent caching
+        const cacheBuster = new Date().getTime();
+        
         // Get the spreadsheet ID from your Google Sheet URL
         const sheetId = '1AESSj7qTgwxMaYQZi2XbIwcoarOMBTGwUc_g_2Oi8wM';
         
         // This assumes you've published your sheet to the web (File > Share > Publish to web)
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&cacheBuster=${cacheBuster}`;
         
         try {
             const response = await fetch(url);
@@ -321,6 +101,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Create the lollipop chart SVG
     function createLollipopChart(chartData) {
+        // Check if there's data to display
+        if (!chartData || chartData.length === 0) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', 800);
+            svg.setAttribute('height', 600);
+            
+            const noDataText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            noDataText.setAttribute('x', 400);
+            noDataText.setAttribute('y', 300);
+            noDataText.setAttribute('class', 'no-data-text');
+            noDataText.textContent = 'No data available yet. Submit the form to see results!';
+            svg.appendChild(noDataText);
+            
+            return svg;
+        }
+        
         // SVG dimensions and margins
         const width = 800;
         const height = 600;
@@ -344,14 +140,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const yScale = innerHeight / displayData.length;
         
         // Add title
-        const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        title.setAttribute('x', width / 2);
-        title.setAttribute('y', 30);
-        title.setAttribute('text-anchor', 'middle');
-        title.setAttribute('font-size', '18px');
-        title.setAttribute('font-weight', 'bold');
-        title.textContent = 'Age Ranges by Country';
-        svg.appendChild(title);
+        //const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        //title.setAttribute('x', width / 2);
+        //title.setAttribute('y', 30);
+        //title.setAttribute('class', 'chart-title');
+        //title.textContent = 'Age Ranges by Country';
+        //svg.appendChild(title);
         
         // Create a group for the chart content
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -368,8 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xAxisLine.setAttribute('y1', 0);
         xAxisLine.setAttribute('x2', innerWidth);
         xAxisLine.setAttribute('y2', 0);
-        xAxisLine.setAttribute('stroke', '#000');
-        xAxisLine.setAttribute('stroke-width', '1');
+        xAxisLine.setAttribute('class', 'axis-line');
         xAxis.appendChild(xAxisLine);
         
         // X axis ticks and labels
@@ -382,16 +175,14 @@ document.addEventListener('DOMContentLoaded', function() {
             tick.setAttribute('y1', 0);
             tick.setAttribute('x2', tickX);
             tick.setAttribute('y2', 5);
-            tick.setAttribute('stroke', '#000');
-            tick.setAttribute('stroke-width', '1');
+            tick.setAttribute('class', 'axis-tick');
             xAxis.appendChild(tick);
             
             // Tick label
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.setAttribute('x', tickX);
             label.setAttribute('y', 20);
-            label.setAttribute('text-anchor', 'middle');
-            label.setAttribute('font-size', '12px');
+            label.setAttribute('class', 'axis-label');
             label.textContent = i;
             xAxis.appendChild(label);
         }
@@ -400,8 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         xLabel.setAttribute('x', innerWidth / 2);
         xLabel.setAttribute('y', 50);
-        xLabel.setAttribute('text-anchor', 'middle');
-        xLabel.setAttribute('font-size', '14px');
+        xLabel.setAttribute('class', 'x-axis-title');
         xLabel.textContent = 'Age';
         xAxis.appendChild(xLabel);
         
@@ -417,28 +207,55 @@ document.addEventListener('DOMContentLoaded', function() {
             stick.setAttribute('y1', yPos);
             stick.setAttribute('x2', d.maxAge * xScale);
             stick.setAttribute('y2', yPos);
-            stick.setAttribute('stroke', '#2a9d8f');
-            stick.setAttribute('stroke-width', '2');
+            stick.setAttribute('class', 'lollipop-stick');
             g.appendChild(stick);
+            
+            // Create a group for the lollipop circle and count display
+            const circleGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            circleGroup.setAttribute('class', 'lollipop-group');
+            g.appendChild(circleGroup);
             
             // Average age marker (the lollipop circle)
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', d.avgAge * xScale);
             circle.setAttribute('cy', yPos);
             circle.setAttribute('r', Math.min(10, Math.max(5, d.count * 2))); // Size based on count, with limits
-            circle.setAttribute('fill', '#e76f51');
+            circle.setAttribute('class', 'lollipop-circle');
             
-            // Tooltip on hover
+            // Tooltip on hover - keep existing tooltip data
             circle.setAttribute('data-tooltip', `${d.country}: Avg Age ${d.avgAge}, Range ${d.minAge}-${d.maxAge}, Count: ${d.count}`);
-            g.appendChild(circle);
+            circleGroup.appendChild(circle);
+            
+            // Create count display text that's initially hidden
+            const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            countText.setAttribute('x', d.avgAge * xScale);
+            countText.setAttribute('y', yPos - 15); // Position above the circle
+            countText.setAttribute('text-anchor', 'middle');
+            countText.setAttribute('class', 'count-text');
+            countText.style.opacity = '0'; // Hidden by default
+            countText.textContent = d.count;
+            circleGroup.appendChild(countText);
+            
+            // Create count background for better visibility
+            const countBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            const textBBox = countText.getBBox ? countText.getBBox() : { width: 20, height: 14 }; // Fallback if getBBox not available
+            countBackground.setAttribute('x', d.avgAge * xScale - textBBox.width/2 - 3);
+            countBackground.setAttribute('y', yPos - 15 - textBBox.height + 3);
+            countBackground.setAttribute('width', textBBox.width + 6);
+            countBackground.setAttribute('height', textBBox.height + 2);
+            countBackground.setAttribute('rx', 3); // Rounded corners
+            countBackground.setAttribute('class', 'count-background');
+            countBackground.style.opacity = '0'; // Hidden by default
+            
+            // Insert background before text so text appears on top
+            circleGroup.insertBefore(countBackground, countText);
             
             // Country label
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.setAttribute('x', -10);
             label.setAttribute('y', yPos);
-            label.setAttribute('text-anchor', 'end');
+            label.setAttribute('class', 'country-label');
             label.setAttribute('alignment-baseline', 'middle');
-            label.setAttribute('font-size', '12px');
             label.textContent = d.country;
             g.appendChild(label);
             
@@ -446,10 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const rangeLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             rangeLabel.setAttribute('x', d.maxAge * xScale + 10);
             rangeLabel.setAttribute('y', yPos);
+            rangeLabel.setAttribute('class', 'range-label');
             rangeLabel.setAttribute('alignment-baseline', 'middle');
-            rangeLabel.setAttribute('font-size', '12px');
-            rangeLabel.textContent = `${d.minAge}-${d.maxAge} (avg: ${d.avgAge})`;
+            rangeLabel.textContent = `${d.minAge}-${d.maxAge} years (avg: ${d.avgAge})`;
             g.appendChild(rangeLabel);
+            
+            // Add hover events to show/hide count
+            circleGroup.addEventListener('mouseenter', function() {
+                countText.style.opacity = '1';
+                countBackground.style.opacity = '0.8';
+            });
+            
+            circleGroup.addEventListener('mouseleave', function() {
+                countText.style.opacity = '0';
+                countBackground.style.opacity = '0';
+            });
         });
         
         return svg;
@@ -464,7 +292,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Show loading message
-        container.innerHTML = 'Loading data...';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-indicator';
+        loadingDiv.innerHTML = 'Loading data...';
+        
+        // Only replace content if there's no loading indicator already
+        if (!container.querySelector('.loading-indicator')) {
+            container.innerHTML = '';
+            container.appendChild(loadingDiv);
+        }
         
         try {
             // Fetch and process data
@@ -483,20 +319,20 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.appendChild(chartSvg);
             
+            // Add link to external CSS file
+            const linkElement = document.createElement('link');
+            linkElement.rel = 'stylesheet';
+            linkElement.href = 'lollipop-chart-styles.css'; // Path to your CSS file
+            document.head.appendChild(linkElement);
+            
             // Add simple tooltip functionality
             document.querySelectorAll('[data-tooltip]').forEach(element => {
                 element.addEventListener('mouseover', function(e) {
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip';
                     tooltip.textContent = this.getAttribute('data-tooltip');
-                    tooltip.style.position = 'absolute';
                     tooltip.style.left = `${e.pageX + 10}px`;
                     tooltip.style.top = `${e.pageY + 10}px`;
-                    tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-                    tooltip.style.color = 'white';
-                    tooltip.style.padding = '5px 10px';
-                    tooltip.style.borderRadius = '4px';
-                    tooltip.style.zIndex = '1000';
                     document.body.appendChild(tooltip);
                     
                     this.addEventListener('mousemove', function(e) {
@@ -510,9 +346,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
+            // Add a small indicator to show when the chart was last updated
+            const updateIndicator = document.createElement('div');
+            updateIndicator.id = 'chart-update-indicator';
+            updateIndicator.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+            
+            container.appendChild(updateIndicator);
+            
+            return true; // Indicate successful chart generation
+            
         } catch (error) {
             console.error('Error generating chart:', error);
             container.innerHTML = 'Error generating chart. Please check console for details.';
+            return false;
         }
     }
 });

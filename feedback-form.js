@@ -143,31 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
         submitContainer.style.display = allQuestionsAnswered ? 'block' : 'none';
     }
     
-    // Handle form submission
-    submitButton.addEventListener('click', function() {
-        // Use the new form submission function
-        sendToGoogleForm(formData);
-        
-        // Show thank you message
-        thankYouMessage.style.display = 'block';
-        submitContainer.style.display = 'none';
-        
-        // Hide all input containers
-        ageContainer.style.display = 'none';
-        locationContainer.style.display = 'none';
-        feedbackContainer.style.display = 'none';
-        
-        // Reset sections visible state
-        sectionsVisible.age = false;
-        sectionsVisible.location = false;
-        sectionsVisible.feedback = false;
-        
-        // Reset button colors
-        ageButton.style.backgroundColor = '';
-        locationButton.style.backgroundColor = '';
-        feedbackButton.style.backgroundColor = '';
-    });
-    
     // Function to send data to Google Form
     function sendToGoogleForm(data) {
         // Form submission URL
@@ -214,6 +189,47 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set src to about:blank to trigger onload
         iframe.src = 'about:blank';
     }
+    
+    // Function to handle form submission with chart update
+    function handleFormSubmission(data) {
+        // Send data to Google Form
+        sendToGoogleForm(data);
+        
+        // Wait a moment for the data to propagate to the spreadsheet
+        // then check if the chart refresh function exists and call it
+        setTimeout(() => {
+            if (document.getElementById('lollipop-chart-container') && 
+                typeof window.generateAgeLollipopChart === 'function') {
+                window.generateAgeLollipopChart('lollipop-chart-container');
+                console.log('Chart update triggered after form submission');
+            }
+        }, 1000); // 1 seconds delay to allow time for Google Form submission to update the sheet
+    }
+
+    // Handle form submission
+    submitButton.addEventListener('click', function() {
+        // Use the form submission handler that will also update the chart
+        handleFormSubmission(formData);
+        
+        // Show thank you message
+        thankYouMessage.style.display = 'block';
+        submitContainer.style.display = 'none';
+        
+        // Hide all input containers
+        ageContainer.style.display = 'none';
+        locationContainer.style.display = 'none';
+        feedbackContainer.style.display = 'none';
+        
+        // Reset sections visible state
+        sectionsVisible.age = false;
+        sectionsVisible.location = false;
+        sectionsVisible.feedback = false;
+        
+        // Reset button colors
+        ageButton.style.backgroundColor = '';
+        locationButton.style.backgroundColor = '';
+        feedbackButton.style.backgroundColor = '';
+    });
 
     // Initialize - hide all inputs
     ageContainer.style.display = 'none';
@@ -222,3 +238,4 @@ document.addEventListener('DOMContentLoaded', function() {
     submitContainer.style.display = 'none';
     thankYouMessage.style.display = 'none';
 });
+
