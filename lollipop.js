@@ -504,6 +504,36 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
+        // Add last updated text directly to the SVG at the bottom of x-axis
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString();
+        const formattedTime = now.toLocaleTimeString();
+        
+        // Create last updated text
+        const lastUpdatedText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lastUpdatedText.setAttribute('class', 'last-updated-text');
+        lastUpdatedText.setAttribute('text-anchor', 'end');
+        
+        // Adjust position based on screen size
+        lastUpdatedText.setAttribute('x', innerWidth);
+        lastUpdatedText.setAttribute('y', actualInnerHeight + 70); // Position below x-axis label
+        
+        // Adjust font size based on screen size
+        if (width < 500) {
+            lastUpdatedText.setAttribute('font-size', '10px');
+        } else if (width < 800) {
+            lastUpdatedText.setAttribute('font-size', '11px');
+        } else {
+            lastUpdatedText.setAttribute('font-size', '12px');
+        }
+        
+        //lastUpdatedText.style.fontStyle = 'italic';
+        lastUpdatedText.style.fill = '#fff1f17f';
+        lastUpdatedText.textContent = `Last updated: ${formattedDate}, ${formattedTime}`;
+        
+        // Add the last updated text to the chart group
+        g.appendChild(lastUpdatedText);
+        
         console.log("Chart SVG created successfully");
         return svg;
     }

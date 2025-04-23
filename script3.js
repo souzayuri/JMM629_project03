@@ -139,22 +139,22 @@ const textBoxes = [
     {
         id: "box-1",
         text: "Each of my toes represents<br>a biome allowing you<br>to select a tapir.<br>Let's use myself as an example.",
-        position: { top: "12%", left: "80%" }
+        position: { top: "5vh", left: "20vw" }
     },
     {
         id: "box-2",
-        text: "You'll' see<br>the tapir's track on the map.<br>If you click on the line,<br>it'll display some information<br>about the tapir",
-        position: { top: "10%", left: "260%" }
+        text: "You'll see<br>the tapir's track on the map.<br>If you click on the line,<br>it'll display some information<br>about the tapir",
+        position: { top: "5vh", left: "60vw" }
     },
     {
         id: "box-3",
         text: "You'll also be able to<br>visualize the total distance<br> walked for each hour throughout the day over the sampled time.",
-        position: { bottom: "20%", left: "100%" }
+        position: { bottom: "12vh", left: "23vw" }
     },
     {
         id: "box-4",
         text: "You can also switch<br>the map mode to a satellite view<br>by clicking on the satellite button <span class='icon-example'>🛰️</span><br>or return to the default view.<br>Use the home button <span class='icon-example'>⌂</span> to reset the map view.",
-        position: { bottom: "55%", left: "335%" }
+        position: { top: "20vh", left: "80vw" }
     }
 ];
 
@@ -328,6 +328,7 @@ tutorialStyle.innerHTML = `
     z-index: 1000;
 }
 
+
 .text-box {
     position: absolute;
     background-color: rgba(162, 152, 179, 0.9);
@@ -347,8 +348,8 @@ tutorialStyle.innerHTML = `
 
 .restart-btn {
     position: absolute;
-    top: 10px;
-    left: 1660px;
+    top: -5vh;
+    left: 50vw;
     padding: 10px 15px;
     background-color:rgba(162, 152, 179, 0.9);
     color: white;
@@ -410,6 +411,9 @@ tutorialStyle.innerHTML = `
 `;
 document.head.appendChild(tutorialStyle);
 
+/************************************/
+// TAPIR PAWS SELECTOR
+/************************************/
 
 // Create tapir structure
 const tapirGroup = selectorSvg.append("g").attr("transform", "scale(0.8) translate(50, 50)");
