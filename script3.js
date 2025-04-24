@@ -1555,21 +1555,53 @@ function highlightSelectedTrack(feature) {
 }
 
 // Function to zoom to the bounds of a track
+// Function to zoom to the bounds of a track
 function zoomToTrack(feature) {
-    // Create a bounding box from the track coordinates
-    const coordinates = feature.geometry.coordinates;
-    const bounds = coordinates.reduce((bounds, coord) => {
-        return bounds.extend(coord);
-    }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-    
-    // Zoom to the track with some padding and smooth animation
-    map.fitBounds(bounds, {
-        padding: 100, // Add some padding around the bounds
-        duration: 1500, // Animation duration in milliseconds
-        pitch: 30, // Maintain 3D view
-        bearing: map.getBearing(), // Maintain current bearing
-        zoom: 8
-    });
+    try {
+        // Make sure coordinates exist and are valid
+        const coordinates = feature.geometry.coordinates;
+        
+        if (!coordinates || coordinates.length < 2) {
+            console.warn("Not enough valid coordinates to create bounds");
+            return;
+        }
+        
+        // Filter out any invalid coordinates before creating the bounds
+        const validCoordinates = coordinates.filter(coord => 
+            Array.isArray(coord) && 
+            coord.length >= 2 && 
+            !isNaN(coord[0]) && 
+            !isNaN(coord[1]) &&
+            Math.abs(coord[0]) <= 180 && 
+            Math.abs(coord[1]) <= 90
+        );
+        
+        if (validCoordinates.length < 2) {
+            console.warn("Not enough valid coordinates after filtering");
+            return;
+        }
+        
+        // Create a bounding box from the valid track coordinates
+        const bounds = validCoordinates.reduce((bounds, coord) => {
+            try {
+                return bounds.extend(coord);
+            } catch (e) {
+                console.warn("Could not extend bounds with coordinate:", coord);
+                return bounds;
+            }
+        }, new mapboxgl.LngLatBounds(validCoordinates[0], validCoordinates[0]));
+        
+        // Zoom to the track with some padding and smooth animation
+        map.fitBounds(bounds, {
+            padding: 100, // Add some padding around the bounds
+            duration: 1500, // Animation duration in milliseconds
+            pitch: 30, // Maintain 3D view
+            bearing: map.getBearing(), // Maintain current bearing
+            zoom: 8
+        });
+    } catch (error) {
+        console.error("Error zooming to track:", error);
+    }
 }
 
 // Function to reset highlights

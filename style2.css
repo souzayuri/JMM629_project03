@@ -40,16 +40,6 @@ body {
   box-shadow: 2px 2px 0px #696363;
 }
 
-/* Submit button positioning on the RIGHT side */
-#submit-container {
-  position: absolute;
-  right: -100%; /* Position to the right of the form */
-  top: 40%; /* Position vertically */
-  transform: translateY(-50%);
-  display: none; /* Initially hidden */
-  z-index: 100;
-}
-
 
 /* Make sure thank you message is visible */
 #thank-you {
@@ -95,7 +85,8 @@ input[type="number"] {
 #location-container,
 #feedback-container {
   position: relative;
-  z-index: 90;
+  z-index: 100;
+  width: 40%;
 }
 
 /* Chart elements */
@@ -968,15 +959,7 @@ video {
    }
   }
   
-  /* Submit button positioning adjustment */
-  #submit-container {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    margin-top: 20px;
-    text-align: center;
-  }
+
   
   /* Make sure submit button is centered on small screens */
   #submit-button {
@@ -1231,6 +1214,18 @@ video {
 .feedback-radio-text {
   font-family: 'Caveat Brush', cursive;
   font-size: 20px;
+}
+
+
+/* Submit button positioning adjustment */
+#submit-container {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  margin-top: 20px;
+  text-align: center;
+  width: 25%;
 }
 
 /* Submit button styling */
