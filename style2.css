@@ -401,6 +401,7 @@ h1 {
 /* ==============================================
    6. TAPIR STYLES & ANIMATIONS
    ============================================== */
+   
 #tapir-container {
   position: relative;
   width: 300px;
@@ -558,18 +559,13 @@ h1 {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
-}
-    
-#main-chart svg {
-  display: block;
-  margin: auto;
-  border-radius: 50%;
   background: #fff7f0;
   box-shadow: 0 2px 4px rgba(0.2,0.2,0.2,0.2);
-  width: 100%;
-  height: auto;
+  border-radius: 50%;
+  margin: auto;
 }
     
+
 /* Chart elements */
 .boundary-circle {
   fill: none;
