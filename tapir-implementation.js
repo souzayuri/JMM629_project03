@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "3": { containerId: "tapir-head-section-3", position: 0 },
       "4": { containerId: "tapir-head-section-4", position: 0 },
       "5": { containerId: "tapir-head-section-5", position: 0 },
+      //"6": { containerId: "tapir-head-section-6", position: 0 },
       "7": { containerId: "tapir-head-section-7", position: 0 },
       "8": { containerId: "tapir-head-section-8", position: 0 },
       "9": { containerId: "tapir-head-section-9", position: 0 },

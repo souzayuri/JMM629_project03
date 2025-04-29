@@ -277,6 +277,47 @@ document.addEventListener('DOMContentLoaded', function() {
         g.setAttribute('transform', `translate(${margin.left}, ${margin.top})`);
         svg.appendChild(g);
         
+        // *** NEW CODE: Add Tapir Lifespan Highlight ***
+        // Define the tapir lifespan range
+        const tapirMinAge = 25;
+        const tapirMaxAge = 30;
+        
+        // Create a rectangle to highlight the tapir lifespan range
+        const tapirRangeRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        tapirRangeRect.setAttribute('x', tapirMinAge * xScale);
+        tapirRangeRect.setAttribute('y', 0);
+        tapirRangeRect.setAttribute('width', (tapirMaxAge - tapirMinAge) * xScale);
+        tapirRangeRect.setAttribute('height', actualInnerHeight);
+        tapirRangeRect.setAttribute('class', 'tapir-range-highlight');
+        tapirRangeRect.setAttribute('fill', 'rgba(75, 192, 192, 0.2)');
+        tapirRangeRect.setAttribute('stroke', 'rgba(75, 192, 192, 0.5)');
+        tapirRangeRect.setAttribute('stroke-dasharray', '5,5');
+        
+        // Add the highlight rectangle to the chart (before other elements so it's in the background)
+        g.appendChild(tapirRangeRect);
+        
+        // Add Tapir lifespan label
+        const tapirLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tapirLabel.setAttribute('x', (tapirMinAge + (tapirMaxAge - tapirMinAge) / 2) * xScale);
+        tapirLabel.setAttribute('y', -10); // Position above the chart
+        tapirLabel.setAttribute('class', 'tapir-label');
+        tapirLabel.setAttribute('text-anchor', 'middle');
+        tapirLabel.setAttribute('font-size', '14px');
+        tapirLabel.setAttribute('fill', 'rgba(75, 192, 192, 1)');
+        tapirLabel.textContent = 'We tapirs live this long';
+        
+        // Create a small tapir icon/emoji
+        const tapirIcon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tapirIcon.setAttribute('x', (tapirMinAge + (tapirMaxAge - tapirMinAge) / 2) * xScale);
+        tapirIcon.setAttribute('y', 15); // Position below the label
+        tapirIcon.setAttribute('class', 'tapir-icon');
+        tapirIcon.setAttribute('text-anchor', 'middle');
+        tapirIcon.setAttribute('font-size', '20px');
+        
+        // Add the tapir label and icon to the chart
+        g.appendChild(tapirLabel);
+        // *** END NEW CODE ***
+        
         // Add X axis
         const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         xAxis.setAttribute('transform', `translate(0, ${actualInnerHeight})`);
@@ -383,6 +424,14 @@ document.addEventListener('DOMContentLoaded', function() {
             circle.setAttribute('r', circleSize);
             circle.setAttribute('class', 'lollipop-circle');
             
+            // *** NEW CODE: Check if the lollipop is within tapir lifespan range ***
+            if (d.avgAge >= tapirMinAge && d.avgAge <= tapirMaxAge) {
+                circle.setAttribute('fill', 'rgba(75, 192, 192, 1)'); // Highlight circles in range
+                circle.setAttribute('stroke', 'rgba(75, 192, 192, 0.8)');
+                circle.setAttribute('stroke-width', '2');
+            }
+            // *** END NEW CODE ***
+            
             // Add the circle to the group
             circleGroup.appendChild(circle);
             
@@ -426,6 +475,12 @@ document.addEventListener('DOMContentLoaded', function() {
             label.setAttribute('dominant-baseline', 'middle');
             label.textContent = d.country;
             
+            // *** NEW CODE: Highlight countries in tapir range ***
+            if (d.avgAge >= tapirMinAge && d.avgAge <= tapirMaxAge) {
+                label.setAttribute('fill', 'rgba(75, 192, 192, 1)');
+            }
+            // *** END NEW CODE ***
+            
             // Adjust font size for smaller screens
             if (width < 500) {
                 label.setAttribute('font-size', '12px');
@@ -448,6 +503,12 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 rangeLabel.textContent = `${d.minAge}-${d.maxAge} Years (avg: ${d.avgAge})`;
             }
+            
+            // *** NEW CODE: Highlight range labels in tapir range ***
+            if (d.avgAge >= tapirMinAge && d.avgAge <= tapirMaxAge) {
+                rangeLabel.setAttribute('fill', 'rgba(75, 192, 192, 1)');
+            }
+            // *** END NEW CODE ***
             
             // Adjust font size for smaller screens
             if (width < 500) {
@@ -597,4 +658,4 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
     }
-});
+})

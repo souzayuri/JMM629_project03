@@ -270,34 +270,54 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+
+
 //##################################################
 // Button click event handler
 //##################################################
 
 document.addEventListener('DOMContentLoaded', function() {
   const scrollButton = document.getElementById('scroll-down-button');
+  const backButton = document.getElementById('scroll-back-button');
   const scrollContainer = document.querySelector('.scroll-container');
   let hasScrolled = false; // Track if user has scrolled
+  let hasBackScrolled = false; // Track if user has used back button
   
-// Function to handle button click and refresh when returning to top
-function handleButtonClick() {
-  // Check if we're in "return to top" mode
-  if (scrollButton.classList.contains('return-to-top')) {
-    // First scroll to the top of the page
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-    
-    // After the scroll animation completes, refresh the page
-    setTimeout(() => {
-      window.location.reload();
-    }, 800); // Wait for scroll animation (about 800ms)
-  } else {
-    // Regular scroll down behavior
-    scrollToNextSection();
+  // Function to handle scroll down button click and refresh when returning to top
+  function handleScrollButtonClick() {
+    // Check if we're in "return to top" mode
+    if (scrollButton.classList.contains('return-to-top')) {
+      // First scroll to the top of the page
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // After the scroll animation completes, refresh the page
+      setTimeout(() => {
+        window.location.reload();
+      }, 800); // Wait for scroll animation (about 800ms)
+    } else {
+      // Regular scroll down behavior
+      scrollToNextSection();
+    }
   }
-}
+  
+  // Function to handle back button click
+  function handleBackButtonClick() {
+    // Mark that the back button has been used
+    if (!hasBackScrolled) {
+      hasBackScrolled = true;
+      backButton.classList.add('scrolled');
+      // Remove the pulse effect after 5 seconds
+      setTimeout(() => {
+        backButton.classList.remove('scrolled');
+      }, 5000);
+    }
+    
+    // Scroll to previous section
+    scrollToPrevSection();
+  }
   
   // Function to scroll to the next section
   function scrollToNextSection() {
@@ -328,8 +348,43 @@ function handleButtonClick() {
     }
   }
   
-  // Enhanced function to check scroll position and update button state
-  function updateButtonState() {
+  // Function to scroll to the previous section
+  function scrollToPrevSection() {
+    const currentPosition = window.scrollY;
+    const sections = document.querySelectorAll('.step, .two-column-container');
+    
+    // Find the previous section to scroll to
+    let targetSection = null;
+    let previousSection = null;
+    
+    for (const section of sections) {
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      // If this section is above our current position (with a small buffer)
+      if (sectionTop < currentPosition - 50) {
+        previousSection = section;
+      } else {
+        // We've found the current section, so the previous one is what we want
+        break;
+      }
+    }
+    
+    // Use the last section we found before the current position
+    targetSection = previousSection;
+    
+    // If we found a target section, scroll to it
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If no previous section found, go to the very top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }
+  
+  // Enhanced function to check scroll position and update button states
+  function updateButtonStates() {
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = window.scrollY;
     const clientHeight = document.documentElement.clientHeight;
@@ -353,12 +408,19 @@ function handleButtonClick() {
       scrollButton.classList.remove('scrolled');
     }
     
+    // Update back button visibility
+    if (scrollTop > 100) {
+      backButton.style.display = 'block';
+    } else {
+      backButton.style.display = 'none';
+    }
+    
     // Enhance button visibility on mobile
     if (window.innerWidth <= 480) {
-      // Make button slightly more visible on mobile
+      // Make buttons slightly more visible on mobile
       scrollButton.style.opacity = scrollTop > 100 ? '0.9' : '0.8';
       
-      // Position the button slightly higher on mobile to avoid overlapping with content
+      // Position the scroll button slightly higher on mobile
       scrollButton.style.bottom = '15px';
     } else {
       // Reset for larger screens
@@ -368,17 +430,28 @@ function handleButtonClick() {
   }
   
   // Add event listeners
-  window.addEventListener('scroll', updateButtonState);
-  scrollButton.addEventListener('click', handleButtonClick);
+  window.addEventListener('scroll', updateButtonStates);
+  scrollButton.addEventListener('click', handleScrollButtonClick);
   
-  // Add touch event for mobile
+  // Add back button event listeners if it exists
+  if (backButton) {
+    backButton.addEventListener('click', handleBackButtonClick);
+    
+    // Add touch event for mobile
+    backButton.addEventListener('touchstart', function(e) {
+      e.preventDefault(); // Prevent double-firing
+      handleBackButtonClick();
+    }, { passive: false });
+  }
+  
+  // Add touch event for scroll button on mobile
   scrollButton.addEventListener('touchstart', function(e) {
     e.preventDefault(); // Prevent double-firing
-    handleButtonClick();
+    handleScrollButtonClick();
   }, { passive: false });
   
   // Initial check
-  updateButtonState();
+  updateButtonStates();
 });
 
 // Function placeholder for chart resizing - implement this in your chart JS file

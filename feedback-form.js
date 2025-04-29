@@ -365,4 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the button position based on screen size
     updateSubmitButtonPosition();
+
+    
 });

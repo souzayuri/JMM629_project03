@@ -187,7 +187,22 @@ input[type="number"] {
   font-style: italic;
 }
 
-      
+/* Tapir highlight specific styles */
+.tapir-range-highlight {
+  fill: #4bc0c026;
+  stroke: #fffaf0;
+  stroke-width: 1px;
+  stroke-dasharray: 5,5;
+  pointer-events: none; /* Allow clicking through the highlight */
+}
+
+.tapir-label {
+  font-size: 14px;
+  fill: #fffaf0;
+  pointer-events: none;
+}
+
+
 /* ==============================================
    2. TYPOGRAPHY & TEXT EFFECTS
    ============================================== */
@@ -322,6 +337,8 @@ h1 {
   text-align: center;
 }
     
+
+
 /* ==============================================
    5. TWO-COLUMN LAYOUT
    ============================================== */
@@ -488,6 +505,8 @@ h1 {
 .biome-modal:hover, .modal-title:hover, .selection-list:hover {
   filter: brightness(0.99);
 }
+
+
     
 /* ==============================================
    7. MODAL & DROPDOWNS
@@ -758,6 +777,90 @@ video {
   animation: none;
 }
     
+
+
+
+#scroll-back-button {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 80px;
+  height: 80px;
+  background-color: transparent;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  opacity: 1;
+  z-index: 1000;
+  box-shadow: none;
+  cursor: url('figures/tapirs_pawn_flipped_colored_fade.svg') 12 12, auto !important;
+  animation: bodyBounce 2s ease-in-out infinite;
+}
+
+/* Shadow effect under feet */
+#scroll-back-button::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 50%;
+  z-index: -1;
+  animation: shadowPulse 2s ease-in-out infinite;
+}
+
+/* Foot animations */
+#scroll_back_button_svg .left-foot {
+  animation: leftFootWalk 2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+#scroll_back_button_svg .right-foot {
+  animation: rightFootWalk 2s ease-in-out infinite;
+  animation-delay: 1s;
+  transform-origin: bottom center;
+}
+
+#scroll-back-button:hover {
+  opacity: 0.9;
+  animation: none;
+}
+
+#scroll-back-button svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+/* Pause animations on hover */
+#scroll-back-button:hover .left-foot,
+#scroll-back-button:hover .right-foot,
+#scroll-back-button:hover {
+  animation-play-state: paused;
+}
+
+/* Stop pulsing after first use */
+#scroll-back-button.scrolled {
+  animation: none;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 480px) {
+  #scroll-back-button {
+    width: 60px;
+    height: 60px;
+    top: 15px;
+    right: 15px;
+  }
+}
+
+
 /* ==============================================
   11. ANIMATIONS & KEYFRAMES
   ============================================== */
@@ -1079,6 +1182,7 @@ video {
   gap: 10px;
   margin: 20px 0;
   max-width: 900px;
+  opacity: 0.8;
 }
 
 .mosaic-item {
@@ -1153,6 +1257,8 @@ video {
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
   z-index: 92;
+  animation: pulse 1.5s infinite;
+  
 }
 
 .feedback-button:hover {
